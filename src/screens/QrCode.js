@@ -1,8 +1,7 @@
-// src/screens/HomeScreen.js
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-export default function Camera() {
+export default function QrCode() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Bem-vindo à Camera!</Text>

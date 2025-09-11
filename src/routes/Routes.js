@@ -1,83 +1,54 @@
-import React, { useState } from "react";
-import { View, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import * as Animatable from "react-native-animatable";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { FontAwesome } from '@expo/vector-icons';
+import Inicio from '../screens/Inicio';
+import ListarMaquina from '../screens/ListarMaquina';
+import QrCode from '../screens/QrCode';
+import Notificacoes from '../screens/Notificacoes';
+import Perfil from '../screens/Perfil';
+import Header from '../components/Header';
 
-// Telas
-import Splash from "../screens/Splash";
-import Inicio from "../screens/Inicio";
-import ListarMaquina from "../screens/ListarMaquina";
-import Camera from "../screens/Camera";
-import Notificacoes from "../screens/Notificacoes";
-import Perfil from "../screens/Perfil";
-import Login from "../screens/Login";
 
+const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function HomeTabs(props) {
-  const [selected, setSelected] = useState("Início");
-
-  const tabs = [
-    { name: "Início", icon: "home" },
-    { name: "Máquinas", icon: "list" },
-    { name: "Câmera", icon: "camera" },
-    { name: "Notificações", icon: "bell" },
-    { name: "Perfil", icon: "user" },
-  ];
-
-  const renderScreen = () => {
-    switch (selected) {
-      case "Início":
-        return <Inicio {...props} />;
-      case "Máquinas":
-        return <ListarMaquina {...props} />;
-      case "Câmera":
-        return <Camera {...props} />;
-      case "Notificações":
-        return <Notificacoes {...props} />;
-      case "Perfil":
-        return <Perfil {...props} />;
-      default:
-        return <Inicio {...props} />;
-    }
-  };
-
+function MainTabs() {
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>{renderScreen()}</View>
-
-      <View style={styles.tabBar}>
-        {tabs.map(tab => {
-          const isActive = selected === tab.name;
-          return (
-            <TouchableOpacity
-              key={tab.name}
-              style={styles.tabButton}
-              onPress={() => setSelected(tab.name)}
-              activeOpacity={0.7}
-            >
-              <Animatable.View
-                animation={isActive ? "pulse" : undefined}
-                style={[
-                  styles.iconContainer,
-                  isActive && styles.activeBackground,
-                  isActive && styles.elevated,
-                  isActive && styles.floating,
-                ]}
-              >
-                <FontAwesome5
-                  name={tab.icon}
-                  size={isActive ? 28 : 22}
-                  color={isActive ? "#0C254E" : "#fff"}
-                />
-              </Animatable.View>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    </SafeAreaView>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: '#fff',
+        tabBarInactiveTintColor: '#fff',
+        tabBarStyle: {
+          backgroundColor: '#001943',
+          borderTopColor: '#053172',
+          height: 80,
+          padding: 16,
+        },
+        tabBarIcon: ({ color, size }) => {
+          if (route.name === 'Inicio') {
+            return <FontAwesome name="home" size={size} color={color} />;
+          } else if (route.name === 'ListarMaquina') {
+            return <FontAwesome name="list-ul" size={size} color={color} />;
+          } else if (route.name === 'QrCode') {
+            return <FontAwesome name="qrcode" size={size} color={color} />;
+          } else if (route.name === 'Notificacoes') {
+            return <FontAwesome name="bell" size={size} color={color} />;
+          } else if (route.name === 'Perfil') {
+            return <FontAwesome name="user" size={size} color={color} />;
+          }
+        },
+      })}
+    >
+      <Tab.Screen name="Inicio" component={Inicio} />
+      <Tab.Screen name="ListarMaquina" component={ListarMaquina} />
+      <Tab.Screen name="QrCode" component={QrCode} />
+      <Tab.Screen name="Notificacoes" component={Notificacoes} />
+      <Tab.Screen name="Perfil" component={Perfil} />
+    </Tab.Navigator>
   );
 }
 
@@ -85,51 +56,9 @@ export default function Routes() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Splash" component={Splash} />
-        <Stack.Screen name="Login" component={Login} />
-
-        <Stack.Screen name="Home">
-          {props => <HomeTabs {...props} />}
-        </Stack.Screen>
-        <Stack.Screen name="Perfil">
-          {props => <Perfil {...props} />}
-        </Stack.Screen>
+        <Stack.Screen name="MainTabs" component={MainTabs} />
+        <Stack.Screen name="Header" component={Header} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fdf5f0" },
-  content: { flex: 1 },
-  tabBar: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 12,
-    backgroundColor: "#0C254E",
-    borderTopWidth: 1,
-    borderColor: "#0C254E",
-  },
-  tabButton: { alignItems: "center" },
-  iconContainer: {
-    padding: 12,
-    borderRadius: 50,
-    backgroundColor: "transparent",
-  },
-  activeBackground: {
-    backgroundColor: "#fff",
-    borderRadius: 50,
-    padding: 14,
-  },
-  elevated: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-    elevation: 8,
-  },
-  floating: {
-    marginBottom: 22,
-  },
-});
