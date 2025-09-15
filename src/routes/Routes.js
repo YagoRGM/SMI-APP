@@ -2,14 +2,13 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { FontAwesome } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; // <-- modernos
 import Inicio from '../screens/Inicio';
 import ListarMaquina from '../screens/ListarMaquina';
 import QrCode from '../screens/QrCode';
 import Notificacoes from '../screens/Notificacoes';
 import Perfil from '../screens/Perfil';
 import Header from '../components/Header';
-
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -21,25 +20,29 @@ function MainTabs() {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarActiveTintColor: '#fff',
-        tabBarInactiveTintColor: '#fff',
+        tabBarInactiveTintColor: '#888',
         tabBarStyle: {
           backgroundColor: '#001943',
           borderTopColor: '#053172',
-          height: 80,
-          padding: 16,
+          height: 60,
+          paddingTop: 5,
         },
         tabBarIcon: ({ color, size }) => {
+          let iconName;
+
           if (route.name === 'Inicio') {
-            return <FontAwesome name="home" size={size} color={color} />;
+            iconName = 'home';
           } else if (route.name === 'ListarMaquina') {
-            return <FontAwesome name="list-ul" size={size} color={color} />;
+            iconName = 'format-list-bulleted-square'; 
           } else if (route.name === 'QrCode') {
-            return <FontAwesome name="qrcode" size={size} color={color} />;
+            iconName = 'qrcode-scan';
           } else if (route.name === 'Notificacoes') {
-            return <FontAwesome name="bell" size={size} color={color} />;
+            iconName = 'bell';
           } else if (route.name === 'Perfil') {
-            return <FontAwesome name="user" size={size} color={color} />;
+            iconName = 'account';
           }
+
+          return <MaterialCommunityIcons name={iconName} size={26} color={color} />;
         },
       })}
     >
