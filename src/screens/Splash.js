@@ -6,7 +6,7 @@ export default function Splash({ navigation }) {
   useEffect(() => {
     // depois de 2 segundos, troca pra Home (ou Login)
     const timer = setTimeout(() => {
-      navigation.replace("Home");
+      navigation.replace("MainTabs");
     }, 2300);
     return () => clearTimeout(timer);
   }, [navigation]);
@@ -16,7 +16,7 @@ export default function Splash({ navigation }) {
       <Animatable.Image
         animation="bounceIn"
         duration={2000}
-        source={require("../assets/img/logo1.png")}
+        source={require("../assets/img/logo2.png")}
         style={styles.logo}
         resizeMode="contain"
       />

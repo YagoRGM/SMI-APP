@@ -166,7 +166,7 @@ export default function Inicio() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#001943" }}>
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <Header />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.title}>Dashboard</Text>
@@ -227,27 +227,27 @@ export default function Inicio() {
           </View>
         </View>
 
-        <Text style={styles.title}>Eficiência Sustentável</Text>
+        <Text style={styles.miniTitle}>Eficiência Sustentável</Text>
         <Text style={styles.text}>
           Acompanhe análises da IA sobre o desempenho das máquinas, descubra oportunidades de eficiência e recomendações de sustentabilidade para reduzir custos e impacto ambiental.
         </Text>
         <Pressable
           style={({ pressed }) => [
             styles.button,
-            { backgroundColor: pressed ? "#075ee0ff" : "#00c1fc" },
+            { opacity: pressed ? 0.8 : 1 },
           ]}
         >
           <Text style={styles.buttonText}>Ver Relatórios</Text>
         </Pressable>
 
-        <Text style={styles.title}>Está tendo dificuldades?</Text>
+        <Text style={styles.miniTitle}>Está tendo dificuldades?</Text>
         <Text style={styles.text}>
           Precisa de ajuda na realização de alguma tarefa específica? Fale com nosso Chat-Bot!
         </Text>
         <Pressable
           style={({ pressed }) => [
-            styles.button,
-            { backgroundColor: pressed ? "#075ee0ff" : "#00c1fc" },
+            styles.buttonSecondary,
+            { opacity: pressed ? 0.8 : 1 },
           ]}
         >
           <Text style={styles.buttonText}>Falar com o Chat-bot</Text>
@@ -258,17 +258,134 @@ export default function Inicio() {
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: { padding: 16 },
-  title: { fontSize: 24, fontWeight: "bold", marginTop: 10, marginBottom: 4, color: "#fff", textAlign: "center" },
-  text: { fontSize: 14, marginBottom: 16, color: "#fff", textAlign: "center" },
-  cardRow: { flexDirection: "row", justifyContent: "space-between" },
-  card: { backgroundColor: "#012d5c", padding: 16, borderRadius: 12, marginBottom: 16, flex: 1, marginRight: 8 },
-  cardNumber: { fontSize: 24, fontWeight: "bold", color: "#fff" },
-  cardText: { fontSize: 14, color: "#fff" },
-  cardDate: { fontSize: 12, color: "#ccc", marginTop: 4 },
-  graphCard: { backgroundColor: "#012d5c", padding: 16, borderRadius: 12, marginBottom: 16 },
-  cardTitle: { color: "#fff", fontWeight: "bold", fontSize: 18, marginBottom: 8 },
-  indicatorCard: { backgroundColor: "#012d5c", padding: 16, borderRadius: 12 },
-  button: { borderRadius: 8, marginBottom: 10 },
-  buttonText: { color: "#fff", textAlign: "center", padding: 8 },
+  scrollContainer: { padding: 16, paddingBottom: 40 },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginTop: 10,
+    marginBottom: 14,
+    color: "#012d5c",
+    textAlign: "center",
+  },
+  miniTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginTop: 20,
+    marginBottom: 10,
+    color: "#012d5c",
+    textAlign: "center",
+  },
+
+  text: {
+    fontSize: 15,
+    marginBottom: 16,
+    color: "#333",
+    textAlign: "center",
+    lineHeight: 20,
+  },
+
+  cardRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+
+  card: {
+    backgroundColor: "#012d5c",
+    padding: 20,
+    borderRadius: 16,
+    flex: 1,
+    marginHorizontal: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+
+  cardNumber: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 6,
+  },
+
+  cardText: { fontSize: 15, color: "#f1f1f1" },
+
+  cardDate: { fontSize: 12, color: "#bbb", marginTop: 6 },
+
+  // Gráficos
+  graphCard: {
+    backgroundColor: "#012d5c",
+    padding: 18,
+    borderRadius: 16,
+    marginTop: 14,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+
+  cardTitle: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 20,
+    marginBottom: 14,
+    textAlign: "center",
+  },
+
+  indicatorCard: {
+    backgroundColor: "#012d5c",
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
+  // Botões
+  button: {
+    marginTop: 10,
+    marginBottom: 20,
+    width: "60%",
+    alignSelf: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    borderRadius: 10,
+    backgroundColor: "#012d5c",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
+  buttonSecondary: {
+    marginTop: 10,
+    marginBottom: 30,
+    width: "60%",
+    alignSelf: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    borderRadius: 10,
+    backgroundColor: "#075ee0ff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
+  buttonText: {
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "bold",
+    textAlign: "center",
+    letterSpacing: 0.5,
+  },
 });

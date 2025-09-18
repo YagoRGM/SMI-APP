@@ -2,13 +2,14 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; // <-- modernos
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Inicio from '../screens/Inicio';
 import ListarMaquina from '../screens/ListarMaquina';
 import QrCode from '../screens/QrCode';
 import Notificacoes from '../screens/Notificacoes';
 import Perfil from '../screens/Perfil';
 import Header from '../components/Header';
+import Splash from '../screens/Splash';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -59,6 +60,7 @@ export default function Routes() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="MainTabs" component={MainTabs} />
         <Stack.Screen name="Header" component={Header} />
       </Stack.Navigator>
