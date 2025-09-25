@@ -9,7 +9,7 @@ export default function Notificacoes() {
     { id: 2, tipo: "Cuidado", setor: 1, maquinaId: "1256123", obs: "Medida Protetiva desativada" },
     { id: 3, tipo: "Informação", setor: 6, maquinaId: "5641234", obs: "Produção em andamento" },
     { id: 4, tipo: "Sucesso", setor: 15, maquinaId: "9974245", obs: "Produto Finalizado" },
-    { id: 5, tipo: "Sucesso", setor: 15, maquinaId: "9974245", obs: "Produto Finalizado" },
+    { id: 5, tipo: "Relatório", setor: 4, maquinaId: "783265", obs: "Relatório de sustentabilidade gerado" },
   ];
 
   const cores = {
@@ -17,74 +17,115 @@ export default function Notificacoes() {
     Cuidado: "#FFF3CD",
     Informação: "#D1ECF1",
     Sucesso: "#D4EDDA",
+    Relatório: "#92f6bcff", // verde sustentável 🌱
   };
+
+  const coresIcones = {
+    Erro: "#DC3545",       // vermelho forte
+    Cuidado: "#FFC107",    // amarelo alerta
+    Informação: "#17A2B8", // azul info
+    Sucesso: "#28A745",    // verde sucesso
+    Relatório: "#2ecc71",  // verde sustentável 🌱
+  };
+
 
   const icones = {
     Erro: "alert-circle",
     Cuidado: "alert",
     Informação: "information",
     Sucesso: "check-circle",
+    Relatório: "leaf", // sustentabilidade
   };
 
   return (
-    <ScrollView style={styles.container}>
-            <Header />
-      
-      <TextInput
-        style={styles.search}
-        placeholder="Pesquisar"
-        placeholderTextColor="#999"
-      />
+    <View style={styles.view} >
+      <Header />
+      <ScrollView style={styles.container}>
 
-      <View style={styles.tags}>
-        <Text style={[styles.tag, { backgroundColor: "#007BFF" }]}>Todas</Text>
-        <Text style={[styles.tag, { backgroundColor: "#28A745" }]}>Sucesso</Text>
-        <Text style={[styles.tag, { backgroundColor: "#DC3545" }]}>Erro</Text>
-        <Text style={[styles.tag, { backgroundColor: "#FFC107" }]}>Aviso</Text>
-        <Text style={[styles.tag, { backgroundColor: "#17A2B8" }]}>Info</Text>
-        <Text style={[styles.tag, { backgroundColor: "#001F3F" }]}>Sugestão</Text>
-      </View>
-
-      {notificacoes.map((item) => (
-        <View
-          key={item.id}
-          style={[styles.notificacao, { backgroundColor: cores[item.tipo] }]}
-        >
-          <View style={styles.row}>
-            <MaterialCommunityIcons
-              name={icones[item.tipo]}
-              size={24}
-              color="#000"
-              style={{ marginRight: 8 }}
-            />
-            <Text style={styles.tipo}>{item.tipo}</Text>
-          </View>
-          <Text style={styles.maquina}>MÁQUINA ID: {item.maquinaId}</Text>
-          <Text style={styles.setor}>SETOR: {item.setor}</Text>
-          <Text style={styles.obs}>OBS: {item.obs}</Text>
+        <Text style={styles.title}>Notificações</Text>
+        <View style={styles.searchContainer}>
+          <MaterialCommunityIcons
+            name="magnify"
+            size={20}
+            color="#999"
+            style={{ marginRight: 6 }}
+          />
+          <TextInput
+            style={styles.search}
+            placeholder="Pesquisar"
+            placeholderTextColor="#999"
+          />
         </View>
-      ))}
 
-      <Pressable style={styles.btnLimpar}>
-        <MaterialCommunityIcons name="delete" size={20} color="#fff" />
-        <Text style={styles.btnText}>Limpar notificações</Text>
-      </Pressable>
-    </ScrollView>
+        <View style={styles.tags}>
+          <Text style={[styles.tag, { backgroundColor: "#007BFF" }]}>Todas</Text>
+          <Text style={[styles.tag, { backgroundColor: "#28A745" }]}>Sucesso</Text>
+          <Text style={[styles.tag, { backgroundColor: "#DC3545" }]}>Erro</Text>
+          <Text style={[styles.tag, { backgroundColor: "#FFC107" }]}>Aviso</Text>
+          <Text style={[styles.tag, { backgroundColor: "#17A2B8" }]}>Info</Text>
+          <Text style={[styles.tag, { backgroundColor: "#27ae60" }]}>Relatórios Sustentáveis</Text>
+        </View>
+
+        {notificacoes.map((item) => (
+          <View
+            key={item.id}
+            style={[styles.notificacao, { backgroundColor: cores[item.tipo] }]}
+          >
+            <View style={styles.row}>
+              <MaterialCommunityIcons
+                name={icones[item.tipo]}
+                size={24}
+                color={coresIcones[item.tipo]} // cor dinâmica
+                style={{ marginRight: 8 }}
+              />
+
+              <Text style={styles.tipo}>{item.tipo}</Text>
+            </View>
+            <Text style={styles.maquina}>MÁQUINA ID: {item.maquinaId}</Text>
+            <Text style={styles.setor}>SETOR: {item.setor}</Text>
+            <Text style={styles.obs}>OBS: {item.obs}</Text>
+          </View>
+        ))}
+
+        <Pressable style={styles.btnLimpar}>
+          <MaterialCommunityIcons name="delete" size={20} color="#fff" />
+          <Text style={styles.btnText}>Limpar notificações</Text>
+        </Pressable>
+      </ScrollView>
+    </View >
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    backgroundColor: "#fff",
+  view: {
+    flex: 1,
   },
-  search: {
+  container: {
+    backgroundColor: "#fff",
+    padding: 16,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginTop: 10,
+    marginBottom: 14,
+    color: "#012d5c",
+    textAlign: "center",
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
-    padding: 8,
+    paddingHorizontal: 8,
     marginBottom: 12,
   },
+  search: {
+    flex: 1,
+    padding: 8,
+  },
+
   tags: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -127,7 +168,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#007BFF",
+    backgroundColor: "#DC3545",
     padding: 12,
     borderRadius: 8,
     marginTop: 8,
