@@ -1,242 +1,107 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions } from "react-native";
 import Header from "../components/Header";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  ArcElement,
-  PointElement,
-  LineElement,
-  RadialLinearScale,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar, Pie, Line, Doughnut, Radar } from "react-chartjs-2";
+import { LineChart, BarChart, PieChart } from "react-native-chart-kit";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  ArcElement,
-  PointElement,
-  LineElement,
-  RadialLinearScale,
-  Title,
-  Tooltip,
-  Legend
-);
+const screenWidth = Dimensions.get("window").width - 70;
 
 export default function Inicio() {
-  // =========================
-  // Dados do gráfico de barras
-  // =========================
-  const barData = {
-    labels: ["Jan", "Fev", "Mar", "Abr", "Mai"],
-    datasets: [
-      {
-        label: "Produção",
-        data: [150, 200, 100, 450, 300],
-        backgroundColor: "#00c1fc",
-        borderRadius: 5,
-      },
-    ],
-  };
+  const barData = { labels: ["Jan", "Fev", "Mar", "Abr", "Mai"], datasets: [{ data: [150, 200, 100, 450, 300] }] };
+  const lineData = { labels: ["Seg", "Ter", "Qua", "Qui", "Sex"], datasets: [{ data: [120, 150, 180, 140, 200], color: () => "#ffba08", strokeWidth: 2 }] };
+  const pieData = [
+    { name: "Cambio 1", population: 62.5, color: "#001943", legendFontColor: "#fff", legendFontSize: 14 },
+    { name: "Trazeira 3D", population: 25, color: "#075ee0ff", legendFontColor: "#fff", legendFontSize: 14 },
+    { name: "Capacitor", population: 12.5, color: "#00c1fcff", legendFontColor: "#fff", legendFontSize: 14 },
+  ];
 
-  const barOptions = {
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      title: { display: false },
-    },
-    scales: {
-      x: {
-        ticks: { color: "#fff", font: { size: 14 } },
-        grid: { color: "rgba(255,255,255,0.1)" },
-      },
-      y: {
-        ticks: { color: "#fff", font: { size: 14 } },
-        grid: { color: "rgba(255,255,255,0.1)" },
-      },
-    },
-  };
-
-  // =========================
-  // Dados do gráfico de pizza
-  // =========================
-  const pieData = {
-    labels: ["Cambio 1", "Trazeira 3D", "Capacitor"],
-    datasets: [
-      {
-        data: [62.5, 25, 12.5],
-        backgroundColor: ["#001943", "#075ee0ff", "#00c1fcff"],
-        borderWidth: 0,
-      },
-    ],
-  };
-
-  const pieOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "bottom",
-        labels: { color: "#fff" },
-      },
-    },
-  };
-
-  // =========================
-  // Dados do gráfico de linha
-  // =========================
-  const lineData = {
-    labels: ["Seg", "Ter", "Qua", "Qui", "Sex"],
-    datasets: [
-      {
-        label: "Produção Diária",
-        data: [120, 150, 180, 140, 200],
-        borderColor: "#ffba08",
-        backgroundColor: "rgba(255,186,8,0.2)",
-        fill: true,
-        tension: 0.4,
-      },
-    ],
-  };
-
-  const lineOptions = {
-    responsive: true,
-    plugins: { legend: { labels: { color: "#fff" } } },
-    scales: {
-      x: { ticks: { color: "#fff" }, grid: { color: "rgba(255,255,255,0.1)" } },
-      y: { ticks: { color: "#fff" }, grid: { color: "rgba(255,255,255,0.1)" } },
-    },
-  };
-
-  // =========================
-  // Dados do gráfico de doughnut
-  // =========================
-  const doughnutData = {
-    labels: ["Máquinas A", "Máquinas B", "Máquinas C"],
-    datasets: [
-      {
-        data: [40, 35, 25],
-        backgroundColor: ["#00c1fc", "#075ee0ff", "#001943"],
-        borderWidth: 0,
-      },
-    ],
-  };
-
-  const doughnutOptions = {
-    responsive: true,
-    plugins: {
-      legend: { position: "bottom", labels: { color: "#fff" } },
-    },
-  };
-
-  // =========================
-  // Dados do gráfico radar
-  // =========================
-  const radarData = {
-    labels: ["Eficiência", "Energia", "Produção", "Manutenção", "Defeitos"],
-    datasets: [
-      {
-        label: "Máquina 1",
-        data: [80, 70, 90, 60, 50],
-        backgroundColor: "rgba(0,193,252,0.3)",
-        borderColor: "#00c1fc",
-        borderWidth: 2,
-      },
-      {
-        label: "Máquina 2",
-        data: [60, 80, 70, 80, 60],
-        backgroundColor: "rgba(255,186,8,0.3)",
-        borderColor: "#ffba08",
-        borderWidth: 2,
-      },
-    ],
-  };
-
-  const radarOptions = {
-    responsive: true,
-    plugins: { legend: { labels: { color: "#fff" } } },
-    scales: {
-      r: { pointLabels: { color: "#fff" }, grid: { color: "rgba(255,255,255,0.1)" }, angleLines: { color: "rgba(255,255,255,0.1)" } },
-    },
+  const chartConfig = {
+    backgroundGradientFrom: "#012d5c",
+    backgroundGradientTo: "#012d5c",
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    decimalPlaces: 0,
+    style: { borderRadius: 16 },
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <Header />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Dashboard</Text>
+        <Text style={styles.title}>📊 Dashboard</Text>
 
         {/* Cards principais */}
         <View style={styles.cardRow}>
           <View style={styles.card}>
+            <Text style={styles.cardIcon}>👷‍♂️</Text>
             <Text style={styles.cardNumber}>1080</Text>
             <Text style={styles.cardText}>Funcionários Ativos</Text>
-            <Text style={styles.cardDate}>Última atualização: 14/09/25</Text>
+            <View style={styles.cardFooter}>
+              <Text style={styles.cardDate}>Última atualização: 14/09/25</Text>
+            </View>
           </View>
           <View style={styles.card}>
+            <Text style={styles.cardIcon}>🏭</Text>
             <Text style={styles.cardNumber}>1250</Text>
             <Text style={styles.cardText}>Máquinas</Text>
-            <Text style={styles.cardDate}>Última atualização: 14/09/25</Text>
+            <View style={styles.cardFooter}>
+              <Text style={styles.cardDate}>Última atualização: 14/09/25</Text>
+            </View>
           </View>
         </View>
 
         <View style={styles.card}>
+          <Text style={styles.cardIcon}>⚡</Text>
           <Text style={styles.cardNumber}>97%</Text>
           <Text style={styles.cardText}>Máquinas Ativas</Text>
-          <Text style={styles.cardDate}>Última atualização: 14/09/25</Text>
+          <View style={styles.cardFooter}>
+            <Text style={styles.cardDate}>Última atualização: 14/09/25</Text>
+          </View>
         </View>
 
         {/* Gráficos */}
         <View style={styles.graphCard}>
           <Text style={styles.cardTitle}>Eficiência Energética</Text>
-          <Pie data={pieData} options={pieOptions} />
+          <PieChart data={pieData} width={screenWidth} height={220} chartConfig={chartConfig} accessor="population" backgroundColor="transparent" paddingLeft="15" absolute />
         </View>
 
         <View style={styles.graphCard}>
           <Text style={styles.cardTitle}>Produção Mensal</Text>
-          <Bar data={barData} options={barOptions} />
+          <BarChart data={barData} width={screenWidth} height={220} chartConfig={chartConfig} style={{ borderRadius: 16 }} />
         </View>
 
         <View style={styles.graphCard}>
           <Text style={styles.cardTitle}>Produção Diária</Text>
-          <Line data={lineData} options={lineOptions} />
+          <LineChart data={lineData} width={screenWidth} height={220} chartConfig={chartConfig} bezier style={{ borderRadius: 16 }} />
         </View>
 
-        <View style={styles.graphCard}>
-          <Text style={styles.cardTitle}>Composição de Máquinas</Text>
-          <Doughnut data={doughnutData} options={doughnutOptions} />
-        </View>
-
-        <View style={styles.graphCard}>
-          <Text style={styles.cardTitle}>Radar de Eficiência</Text>
-          <Radar data={radarData} options={radarOptions} />
-        </View>
-
-        {/* Indicadores */}
+        {/* Indicadores - Produção Atual */}
         <View style={styles.indicators}>
-          <View style={styles.indicatorCard}>
-            <Text style={styles.cardTitle}>Produção atual</Text>
-            <Text style={styles.cardNumber}>5.760 Pilhas</Text>
-            <Text style={styles.cardNumber}>19.760 LEDs</Text>
-            <Text style={styles.cardNumber}>15.760 Capacitores</Text>
+          <Text style={[styles.miniTitle, { marginBottom: 12 }]}>📦 Produção Atual</Text>
+          <View style={styles.prodRow}>
+            <View style={styles.prodCard}>
+              <Text style={styles.prodLabel}>Pilhas</Text>
+              <Text style={styles.prodNumber}>5.760</Text>
+              <View style={[styles.prodBar, { width: "80%", backgroundColor: "#ffba08" }]} />
+            </View>
+            <View style={styles.prodCard}>
+              <Text style={styles.prodLabel}>LEDs</Text>
+              <Text style={styles.prodNumber}>19.760</Text>
+              <View style={[styles.prodBar, { width: "100%", backgroundColor: "#075ee0ff" }]} />
+            </View>
+            <View style={styles.prodCard}>
+              <Text style={styles.prodLabel}>Capacitores</Text>
+              <Text style={styles.prodNumber}>15.760</Text>
+              <View style={[styles.prodBar, { width: "90%", backgroundColor: "#00c1fcff" }]} />
+            </View>
           </View>
         </View>
+
 
         <Text style={styles.miniTitle}>Eficiência Sustentável</Text>
         <Text style={styles.text}>
           Acompanhe análises da IA sobre o desempenho das máquinas, descubra oportunidades de eficiência e recomendações de sustentabilidade para reduzir custos e impacto ambiental.
         </Text>
-        <Pressable
-          style={({ pressed }) => [
-            styles.button,
-            { opacity: pressed ? 0.8 : 1 },
-          ]}
-        >
+        <Pressable style={({ pressed }) => [styles.button, { opacity: pressed ? 0.8 : 1 }]}>
           <Text style={styles.buttonText}>Ver Relatórios</Text>
         </Pressable>
 
@@ -244,12 +109,7 @@ export default function Inicio() {
         <Text style={styles.text}>
           Precisa de ajuda na realização de alguma tarefa específica? Fale com nosso Chat-Bot!
         </Text>
-        <Pressable
-          style={({ pressed }) => [
-            styles.buttonSecondary,
-            { opacity: pressed ? 0.8 : 1 },
-          ]}
-        >
+        <Pressable style={({ pressed }) => [styles.buttonSecondary, { opacity: pressed ? 0.8 : 1 }]}>
           <Text style={styles.buttonText}>Falar com o Chat-bot</Text>
         </Pressable>
       </ScrollView>
@@ -259,133 +119,54 @@ export default function Inicio() {
 
 const styles = StyleSheet.create({
   scrollContainer: { padding: 16, paddingBottom: 40 },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginTop: 10,
-    marginBottom: 14,
-    color: "#012d5c",
-    textAlign: "center",
-  },
-  miniTitle: {
-    fontSize: 24,
-    fontWeight: "700",
-    marginTop: 20,
-    marginBottom: 10,
-    color: "#012d5c",
-    textAlign: "center",
-  },
+  title: { fontSize: 32, fontWeight: "bold", marginTop: 10, marginBottom: 14, color: "#012d5c", textAlign: "center" },
+  miniTitle: { fontSize: 24, fontWeight: "700", marginTop: 20, marginBottom: 10, color: "#012d5c", textAlign: "center" },
+  text: { fontSize: 15, marginBottom: 16, color: "#333", textAlign: "center", lineHeight: 20 },
 
-  text: {
-    fontSize: 15,
-    marginBottom: 16,
-    color: "#333",
-    textAlign: "center",
-    lineHeight: 20,
-  },
-
-  cardRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-
+  cardRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 12 },
   card: {
     backgroundColor: "#012d5c",
     padding: 20,
     borderRadius: 16,
     flex: 1,
-    marginHorizontal: 4,
+    marginHorizontal: 6,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
-    elevation: 4,
+    elevation: 5,
+    alignItems: "center",
+    justifyContent: "space-between",
   },
+  cardIcon: { fontSize: 32, marginBottom: 10 },
+  cardNumber: { fontSize: 28, fontWeight: "bold", color: "#fff", marginBottom: 6 },
+  cardText: { fontSize: 16, color: "#f1f1f1", textAlign: "center", marginBottom: 8 },
+  cardFooter: { borderTopWidth: 1, borderTopColor: "#075ee0ff", paddingTop: 6, width: "100%", alignItems: "center" },
+  cardDate: { fontSize: 12, color: "#ddd" },
 
-  cardNumber: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 6,
-  },
+  graphCard: { backgroundColor: "#012d5c", padding: 18, borderRadius: 16, marginTop: 14, marginBottom: 20, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 5, elevation: 3 },
+  cardTitle: { color: "#fff", fontWeight: "600", fontSize: 20, marginBottom: 14, textAlign: "center" },
 
-  cardText: { fontSize: 15, color: "#f1f1f1" },
-
-  cardDate: { fontSize: 12, color: "#bbb", marginTop: 6 },
-
-  // Gráficos
-  graphCard: {
+  prodRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 16 },
+  prodCard: {
+    flex: 1,
     backgroundColor: "#012d5c",
-    padding: 18,
     borderRadius: 16,
-    marginTop: 14,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-
-  cardTitle: {
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 20,
-    marginBottom: 14,
-    textAlign: "center",
-  },
-
-  indicatorCard: {
-    backgroundColor: "#012d5c",
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 20,
+    padding: 14,
+    marginHorizontal: 4,
+    alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
+  prodLabel: { color: "#fff", fontSize: 14, marginBottom: 6 },
+  prodNumber: { color: "#fff", fontSize: 18, fontWeight: "700", marginBottom: 6 },
+  prodBar: { height: 6, borderRadius: 6 },
 
-  // Botões
-  button: {
-    marginTop: 10,
-    marginBottom: 20,
-    width: "60%",
-    alignSelf: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 10,
-    backgroundColor: "#012d5c",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
 
-  buttonSecondary: {
-    marginTop: 10,
-    marginBottom: 30,
-    width: "60%",
-    alignSelf: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 10,
-    backgroundColor: "#075ee0ff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-
-  buttonText: {
-    color: "#fff",
-    fontSize: 17,
-    fontWeight: "bold",
-    textAlign: "center",
-    letterSpacing: 0.5,
-  },
+  button: { marginTop: 10, marginBottom: 20, width: "60%", alignSelf: "center", justifyContent: "center", paddingVertical: 12, borderRadius: 12, backgroundColor: "#012d5c", shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 3 },
+  buttonSecondary: { marginTop: 10, marginBottom: 30, width: "60%", alignSelf: "center", justifyContent: "center", paddingVertical: 12, borderRadius: 12, backgroundColor: "#075ee0ff", shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 3 },
+  buttonText: { color: "#fff", fontSize: 17, fontWeight: "bold", textAlign: "center", letterSpacing: 0.5 },
 });
