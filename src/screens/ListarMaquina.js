@@ -50,7 +50,7 @@ const maquinas = [
 export default function ListarMaquina() {
   const [tab, setTab] = useState("todas");
   const navigation = useNavigation();
-  
+
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Image source={item.img} style={styles.cardImg} />
@@ -63,19 +63,23 @@ export default function ListarMaquina() {
         </Text>
       </View>
       <View>
-        <TouchableOpacity style={styles.editBtn}>
+        <TouchableOpacity
+          style={styles.editBtn}
+          onPress={() => navigation.navigate("AtualizarMaquina", { maquina: item })}
+        >
           <Text style={styles.btnText}>Editar</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.detailBtn}
-          onPress={() => navigation.navigate("AtualizarMaquina", { maquina: item })}
+          onPress={() => navigation.navigate("Detalhes", { maquina: item })}
         >
           <Text style={styles.btnText}>Detalhes</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
-  
+
   return (
     <View style={{ flex: 1, backgroundColor: "#fff", }}>
       <Header />
@@ -103,10 +107,14 @@ export default function ListarMaquina() {
         />
 
       </View>
-      <TouchableOpacity style={styles.fab}>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigation.navigate("CadastrarMaquina")}
+      >
         <MaterialCommunityIcons name="plus" size={30} color="#fff" />
         <Text style={styles.fabText}>Cadastrar nova máquina</Text>
       </TouchableOpacity>
+
     </View>
   );
 }

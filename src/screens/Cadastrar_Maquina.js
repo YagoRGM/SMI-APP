@@ -9,56 +9,37 @@ import {
     Image,
     Modal,
 } from "react-native";
-import Checkbox from "expo-checkbox";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import Header from "../components/Header_stack";
-import * as ImagePicker from 'expo-image-picker';
+import Checkbox from "expo-checkbox";
 
-export default function AtualizarMaquina({ navigation }) {
+export default function CadastrarMaquina({ navigation }) {
     const [nome, setNome] = useState("");
-    const [descricao, setDescricao] = useState("");
-    const [localizacao, setLocalizacao] = useState("");
-    const [serie, setSerie] = useState("");
-    const [sensorTemp, setSensorTemp] = useState(true);
-    const [sensorEnergia, setSensorEnergia] = useState(true);
-    const [sensorUmidade, setSensorUmidade] = useState(false);
-    const [sensorPressao, setSensorPressao] = useState(false);
-    const [sensorVibracao, setSensorVibracao] = useState(false);
-    const [observacao, setObservacao] = useState("");
+    const [modelo, setModelo] = useState("");
     const [monitoramento, setMonitoramento] = useState(true);
     const [alertas, setAlertas] = useState(true);
-    const [limiteTemp, setLimiteTemp] = useState("");
-    const [responsavel, setResponsavel] = useState("");
-
     const [status, setStatus] = useState("Ativa");
     const [foto, setFoto] = useState(null);
 
     // estados dos modais
     const [modalSalvarVisible, setModalSalvarVisible] = useState(false);
-    const [modalExcluirVisible, setModalExcluirVisible] = useState(false);
     const [modalSucesso, setModalSucesso] = useState({ visible: false, mensagem: "" });
 
-    const handleSalvar = () => {
-        setModalSalvarVisible(false);
-        setModalSucesso({ visible: true, mensagem: "Máquina editada com sucesso!" });
-    };
-
-    const handleExcluir = () => {
-        setModalExcluirVisible(false);
-        setModalSucesso({ visible: true, mensagem: "Máquina excluída com sucesso!" });
-    };
-
-    const handlePickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
+    const handleUploadImage = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
-            aspect: [4, 3],
             quality: 1,
         });
-
         if (!result.canceled) {
             setFoto(result.assets[0].uri);
         }
+    };
+
+    const handleCadastrar = () => {
+        setModalSalvarVisible(false);
+        setModalSucesso({ visible: true, mensagem: "Máquina cadastrada com sucesso!" });
     };
 
     const SectionTitle = ({ emoji, title }) => (
@@ -70,41 +51,39 @@ export default function AtualizarMaquina({ navigation }) {
 
     return (
         <View style={{ flex: 1 }}>
-            <Header title="Atualizar Máquina C4-23" onPressBack={() => navigation.goBack()} />
+            <Header title="Cadastrar Máquina" onPressBack={() => navigation.goBack()} />
             <ScrollView style={styles.container}>
                 <View style={styles.formContainer}>
-                    <Text style={styles.title}>Atualizar informações</Text>
+                    <Text style={styles.title}>Cadastrar informações</Text>
 
+                    <SectionTitle emoji="📝" title="Informações básicas" />
                     <Text style={styles.label}>Nome da máquina</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Máquina de empacotamento"
+                        placeholder="Digite o nome da máquina"
+                        placeholderTextColor="#aaa"
                         value={nome}
                         onChangeText={setNome}
                     />
 
-                    <Text style={styles.label}>Descrição (opcional)</Text>
+                    <Text style={styles.label}>Modelo</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Máquina responsável pelo empacotamento"
-                        value={descricao}
-                        onChangeText={setDescricao}
+                        placeholder="Ex: XRT-5000"
+                        value={modelo}
+                        onChangeText={setModelo}
                     />
-                    
-                    <Text style={styles.label}>Número de série/ID interno</Text>
+
+                    <Text style={styles.label}>Número de série (opcional)</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="C4-23"
-                        value={serie}
-                        onChangeText={setSerie}
+                        placeholder="Ex: MQ-2025-001"
                     />
 
                     <Text style={styles.label}>Localização</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Setor Leste G4"
-                        value={localizacao}
-                        onChangeText={setLocalizacao}
+                        placeholder="Ex: Setor A"
                     />
 
                     <Text style={styles.label}>Status da máquina</Text>
@@ -123,20 +102,17 @@ export default function AtualizarMaquina({ navigation }) {
                     <TextInput
                         style={styles.input}
                         placeholder="Observações sobre a máquina"
-                        value={observacao}
-                        onChangeText={setObservacao}
                     />
 
                     <View style={styles.divider} />
 
                     <SectionTitle emoji="🛠️" title="Configuração de sensores" />
-                    {/* 
-                    {[
-                        { label: "Temperatura", state: sensorTemp, set: setSensorTemp },
-                        { label: "Energia", state: sensorEnergia, set: setSensorEnergia },
-                        { label: "Umidade", state: sensorUmidade, set: setSensorUmidade },
-                        { label: "Pressão", state: sensorPressao, set: setSensorPressao },
-                        { label: "Vibração", state: sensorVibracao, set: setSensorVibracao },
+                    {/* {[
+                        { label: "Temperatura" },
+                        { label: "Energia" },
+                        { label: "Umidade" },
+                        { label: "Pressão" },
+                        { label: "Vibração" },
                     ].map((item, i) => (
                         <View key={i} style={styles.checkboxContainer}>
                             <Checkbox value={item.state} onValueChange={item.set} />
@@ -144,18 +120,14 @@ export default function AtualizarMaquina({ navigation }) {
                         </View>
                     ))} */}
 
-
                     <Text style={styles.label}>Observação (opcional)</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Necessário sensor DHT11 no interior"
-                        value={observacao}
-                        onChangeText={setObservacao}
+                        placeholder="Detalhes adicionais sobre os sensores"
                     />
 
                     <View style={styles.divider} />
                     <SectionTitle emoji="📡" title="Configuração de monitoramento" />
-
                     <View style={styles.checkboxContainer}>
                         <Checkbox value={monitoramento} onValueChange={setMonitoramento} />
                         <Text style={styles.checkboxLabel}>Ativar monitoramento em tempo real</Text>
@@ -168,43 +140,30 @@ export default function AtualizarMaquina({ navigation }) {
                     <Text style={styles.label}>Limites personalizados</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Temperatura máxima de 45°C"
-                        value={limiteTemp}
-                        onChangeText={setLimiteTemp}
+                        placeholder="Temperatura máxima, pressão etc."
                     />
 
                     <Text style={styles.label}>Responsável técnico</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Carlos Silva"
-                        value={responsavel}
-                        onChangeText={setResponsavel}
+                        placeholder="Nome do responsável"
                     />
 
                     <View style={styles.divider} />
-                    <SectionTitle emoji="🖼️" title="Imagem da Máquina" />
-
-                    <TouchableOpacity style={styles.imageBox} onPress={handlePickImage}>
+                    <SectionTitle emoji="🖼️" title="Imagem da máquina" />
+                    <TouchableOpacity style={styles.imageBox} onPress={handleUploadImage}>
                         {foto ? (
                             <Image source={{ uri: foto }} style={styles.image} />
                         ) : (
-                            <Image
-                                source={require("../assets/img/maquina2.png")}
-                                style={[styles.image, { opacity: 0.8 }]}
-                            />
+                            <Text style={{ color: "#999" }}>Clique para adicionar uma imagem</Text>
                         )}
                     </TouchableOpacity>
 
-
-                    {/* Botões com modais */}
                     <TouchableOpacity style={styles.buttonBlue} onPress={() => setModalSalvarVisible(true)}>
-                        <Text style={styles.buttonText}>Salvar máquina</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.buttonRed} onPress={() => setModalExcluirVisible(true)}>
-                        <Text style={styles.buttonText}>Excluir máquina</Text>
+                        <Text style={styles.buttonText}>Cadastrar máquina</Text>
                     </TouchableOpacity>
                 </View>
+
             </ScrollView>
 
             {/* Modal SALVAR */}
@@ -214,17 +173,17 @@ export default function AtualizarMaquina({ navigation }) {
                         <TouchableOpacity style={styles.closeButton} onPress={() => setModalSalvarVisible(false)}>
                             <Ionicons name="close" size={22} color="#333" />
                         </TouchableOpacity>
-                        <Text style={styles.modalTitle}>Salvar Alterações</Text>
+                        <Text style={styles.modalTitle}>Confirmar Cadastro</Text>
                         <Text style={styles.modalText}>
-                            Deseja salvar as alterações feitas na máquina{" "}
-                            <Text style={{ fontWeight: "bold" }}>{nome || "C4-23"}</Text>?
+                            Deseja cadastrar a máquina{" "}
+                            <Text style={{ fontWeight: "bold" }}>{nome || "sem nome"}</Text>?
                         </Text>
 
                         <View style={styles.modalButtonRow}>
                             <TouchableOpacity style={styles.cancelButton} onPress={() => setModalSalvarVisible(false)}>
                                 <Text style={styles.cancelText}>Cancelar</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.confirmButton} onPress={handleSalvar}>
+                            <TouchableOpacity style={styles.confirmButton} onPress={handleCadastrar}>
                                 <Text style={styles.confirmText}>Confirmar</Text>
                             </TouchableOpacity>
                         </View>
@@ -232,34 +191,7 @@ export default function AtualizarMaquina({ navigation }) {
                 </View>
             </Modal>
 
-            {/* Modal EXCLUIR */}
-            <Modal animationType="fade" transparent visible={modalExcluirVisible}>
-                <View style={styles.modalBackground}>
-                    <View style={styles.modalContainer}>
-                        <TouchableOpacity style={styles.closeButton} onPress={() => setModalExcluirVisible(false)}>
-                            <Ionicons name="close" size={22} color="#333" />
-                        </TouchableOpacity>
-                        <Text style={styles.modalTitle}>Excluir Máquina</Text>
-                        <Text style={styles.modalText}>
-                            Tem certeza que deseja <Text style={{ color: "#E53935", fontWeight: "bold" }}>excluir</Text> esta máquina?
-                        </Text>
-
-                        <View style={styles.modalButtonRow}>
-                            <TouchableOpacity style={styles.cancelButton} onPress={() => setModalExcluirVisible(false)}>
-                                <Text style={styles.cancelText}>Cancelar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.confirmButton, { backgroundColor: "#E53935" }]}
-                                onPress={handleExcluir}
-                            >
-                                <Text style={styles.confirmText}>Excluir</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
-
-            {/* Modal de sucesso */}
+            {/* Modal SUCESSO */}
             <Modal animationType="fade" transparent visible={modalSucesso.visible}>
                 <View style={styles.modalBackground}>
                     <View style={styles.modalSucesso}>
@@ -270,7 +202,6 @@ export default function AtualizarMaquina({ navigation }) {
                             style={{ marginBottom: 15 }}
                         />
                         <Text style={styles.modalSucessoTitulo}>{modalSucesso.mensagem}</Text>
-
                         <TouchableOpacity
                             style={styles.modalSucessoButton}
                             onPress={() => {
@@ -280,11 +211,9 @@ export default function AtualizarMaquina({ navigation }) {
                         >
                             <Text style={styles.modalSucessoButtonText}>OK</Text>
                         </TouchableOpacity>
-
                     </View>
                 </View>
             </Modal>
-
         </View>
     );
 }
@@ -299,8 +228,8 @@ const styles = StyleSheet.create({
         marginBottom: 80,
         elevation: 8,
     },
-    title: { fontSize: 22, fontWeight: "bold", marginBottom: 16 },
-    sectionHeader: { flexDirection: "row", alignItems: "center", marginTop: 20, marginBottom: 6 },
+    title: { fontSize: 22, fontWeight: "bold" },
+    sectionHeader: { flexDirection: "row", alignItems: "center", marginTop: 10, marginBottom: 6 },
     sectionEmoji: { fontSize: 20, marginRight: 8 },
     sectionTitle: { fontSize: 18, fontWeight: "600" },
     divider: { height: 2, backgroundColor: "#eee", marginVertical: 10 },
@@ -314,6 +243,13 @@ const styles = StyleSheet.create({
     },
     checkboxContainer: { flexDirection: "row", alignItems: "center", marginBottom: 6 },
     checkboxLabel: { marginLeft: 8 },
+    buttonGray: {
+        backgroundColor: "#ccc",
+        padding: 12,
+        borderRadius: 6,
+        alignItems: "center",
+        marginVertical: 6,
+    },
     buttonBlue: {
         backgroundColor: "#007bff",
         padding: 12,
@@ -328,7 +264,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginVertical: 6,
     },
-    buttonText: { color: "#fff", fontWeight: "bold" },
+    buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
     imageBox: {
         height: 120,
         borderWidth: 1,

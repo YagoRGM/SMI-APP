@@ -13,17 +13,26 @@ export default function Detalhes() {
     const data = {
         labels: ["08h", "09h", "10h", "11h", "12h", "13h"],
         datasets: [
-            { data: [25, 26, 27, 26, 28, 27], color: () => `rgba(33, 150, 243, 1)`, strokeWidth: 3 },
-            { data: [5, 6, 5.5, 6.2, 5.8, 6], color: () => `rgba(76, 175, 80, 1)`, strokeWidth: 3 },
+            {
+                data: [25, 26.5, 27.2, 26.8, 28.1, 27.4], // temperatura com pequenas variações
+                color: () => `#f44336`, // vermelho para temperatura
+                strokeWidth: 3,
+            },
+            {
+                data: [22, 23.5, 25.8, 24.7, 24.3, 23.6], // vibração com variações realistas
+                color: () => `rgba(76, 175, 80, 1)`, // verde para vibração
+                strokeWidth: 3,
+            },
         ],
         legend: ["Temperatura (°C)", "Vibração (Hz)"],
     };
+
 
     return (
         <ScrollView style={styles.container}>
             {/* Header */}
             <Header
-                title="Detalhes da Máquina Esteira 07"
+                title="Detalhes da Esteira B-07"
                 onPressBack={() => navigation.goBack()}
             />
 
@@ -34,7 +43,7 @@ export default function Detalhes() {
                         <Text style={styles.cardTitle}>Resumo da Máquina</Text>
                         <Text style={styles.alertText}>Status da Máquina</Text>
                         <View style={styles.statusRow}>
-                            <View style={styles.statusDot}/>
+                            <View style={styles.statusDot} />
                             <Text style={{ color: 'green', fontWeight: 'bold', marginLeft: 6 }}>ONLINE</Text>
                         </View>
                     </View>
@@ -76,7 +85,7 @@ export default function Detalhes() {
 
             {/* Produtividade */}
             <View style={styles.card}>
-                <Text style={styles.cardTitle}>Produtividade</Text>
+                <Text style={styles.cardTitle}>Performance da Máquina</Text>
                 <LineChart
                     data={data}
                     width={screenWidth}
@@ -91,31 +100,45 @@ export default function Detalhes() {
                         propsForDots: { r: "6", strokeWidth: "2", stroke: "#001943" },
                     }}
                     bezier
-                    style={{ marginVertical: 8, borderRadius: 16 }}
+                    style={{ marginVertical: 8, marginRight: 20, marginLeft: -15, borderRadius: 16 }}
                 />
             </View>
 
             {/* Alertas de IA */}
             <View style={styles.card}>
-                <View style={styles.alertContainer}>
+                <TouchableOpacity
+                    style={styles.alertContainer}
+                    onPress={() => navigation.navigate("Relatorios")}
+                >
                     <MaterialCommunityIcons name="robot" size={28} color="#2196F3" />
                     <View style={styles.alertTextContainer}>
                         <Text style={styles.alertTitle}>Alertas de IA</Text>
                         <Text style={styles.alertText}>Possível superaquecimento em 2 horas</Text>
                     </View>
                     <MaterialCommunityIcons name="chevron-right" size={28} color="#001943" />
-                </View>
+                </TouchableOpacity>
             </View>
 
             {/* Ações rápidas */}
             <View style={styles.actions}>
-                <Text style={{ fontStyle: 'italic', textDecorationLine: 'underline', marginBottom: 50, marginLeft: 8, fontSize: 18 }}>
-                    Ações rápidas
-                </Text>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity
+                    style={{ marginBottom: 52 }}
+                    onPress={() => navigation.navigate("AtualizarMaquina")}
+                >
+                    <Text style={{ fontStyle: 'italic', textDecorationLine: 'underline', marginLeft: 8, marginTop: 0, fontSize: 18 }}>
+                        Ações rápidas
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate("Relatorios")}
+                >
                     <Text style={styles.buttonText}>Ver relatório completo</Text>
                 </TouchableOpacity>
+
             </View>
+
         </ScrollView>
     );
 }
@@ -127,21 +150,21 @@ const styles = StyleSheet.create({
     statusRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 6 },
     statusDot: { width: 10, height: 10, borderRadius: 6, backgroundColor: 'green', marginRight: 2 },
     iconRow: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-end', marginTop: 12 },
-machineCardContent: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center'
-},
-machineInfo: {
-  flex: 1,
-  paddingRight: 12
-},
-machineImageRight: {
-  width: 90,
-  height: 90,
-  marginRight: 12,
-  borderRadius: 12
-},
+    machineCardContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    machineInfo: {
+        flex: 1,
+        paddingRight: 12
+    },
+    machineImageRight: {
+        width: 90,
+        height: 90,
+        marginRight: 12,
+        borderRadius: 12
+    },
     metricsRow: { flexDirection: 'row', justifyContent: 'space-around', marginVertical: 8 },
     metricCard: { flex: 1, margin: 6, padding: 14, borderRadius: 12, alignItems: 'center', elevation: 2 },
     metricValue: { fontWeight: 'bold', fontSize: 16, marginVertical: 4 },

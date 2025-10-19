@@ -2,18 +2,26 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Modal, TextInput, Alert } from "react-native";
 import Header from "../components/Header";
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Perfil({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [nome, setNome] = useState("Lucas Machado");
   const [email, setEmail] = useState("lukzinisback@gmail.com");
-
+  
   const salvarEdicao = () => {
     setModalVisible(false);
     Alert.alert("Sucesso", "Perfil editado com sucesso!");
   };
-
-  const certificacoes = ['NR-10', 'NR-15', 'NR-35', 'NR-42']; // array declarado fora do JSX
+  
+  const certificacoes = ['NR-10', 'NR-15', 'NR-35', 'NR-42'];
+  
+  const handleLogout = () => {
+    setLogoutModalVisible(false);
+    navigation.navigate('Login'); // redireciona para a tela de Login
+  };
 
   return (
     <View style={styles.view}>
@@ -30,13 +38,13 @@ export default function Perfil({ navigation }) {
           <View style={styles.infoBox}>
             <Text style={styles.title}>Meu Perfil</Text>
 
-            <Text style={styles.label}><Text style={styles.bold}>Nome: </Text><Text style={styles.value}>{nome}</Text></Text>
-            <Text style={styles.label}><Text style={styles.bold}>ID: </Text><Text style={styles.value}>004589</Text></Text>
-            <Text style={styles.label}><Text style={styles.bold}>Email: </Text><Text style={styles.value}>{email}</Text></Text>
-            <Text style={styles.label}><Text style={styles.bold}>Profissão: </Text><Text style={styles.value}>Soldador</Text></Text>
-            <Text style={styles.label}><Text style={styles.bold}>Status: </Text><Text style={styles.value}>Férias</Text></Text>
-            <Text style={styles.label}><Text style={styles.bold}>Turno: </Text><Text style={styles.value}>Manhã</Text></Text>
-            <Text style={styles.label}><Text style={styles.bold}>Supervisor: </Text><Text style={styles.value}>Craque Neto</Text></Text>
+            <Text style={styles.label}><Text style={styles.bold}>Nome: </Text>{nome}</Text>
+            <Text style={styles.label}><Text style={styles.bold}>ID: </Text>004589</Text>
+            <Text style={styles.label}><Text style={styles.bold}>Email: </Text>{email}</Text>
+            <Text style={styles.label}><Text style={styles.bold}>Profissão: </Text>Soldador</Text>
+            <Text style={styles.label}><Text style={styles.bold}>Status: </Text>Férias</Text>
+            <Text style={styles.label}><Text style={styles.bold}>Turno: </Text>Manhã</Text>
+            <Text style={styles.label}><Text style={styles.bold}>Supervisor: </Text>Craque Neto</Text>
           </View>
         </View>
 
@@ -61,7 +69,8 @@ export default function Perfil({ navigation }) {
           <TouchableOpacity style={styles.editButton} onPress={() => setModalVisible(true)}>
             <Text style={styles.editText}>Editar</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.logoutButton}>
+          
+          <TouchableOpacity style={styles.logoutButton} onPress={() => setLogoutModalVisible(true)}>
             <Text style={styles.logoutText}>Desconectar</Text>
           </TouchableOpacity>
         </View>
@@ -71,8 +80,11 @@ export default function Perfil({ navigation }) {
       <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
-            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-              <Text style={styles.closeText}>X</Text>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Ionicons name="close" size={26} color="#333" />
             </TouchableOpacity>
 
             <Text style={styles.modalTitle}>Editar Perfil</Text>
@@ -89,6 +101,26 @@ export default function Perfil({ navigation }) {
           </View>
         </View>
       </Modal>
+
+      {/* Modal de confirmação de logout */}
+      <Modal animationType="fade" transparent={true} visible={logoutModalVisible} onRequestClose={() => setLogoutModalVisible(false)}>
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Confirmação</Text>
+            <Text style={[styles.modalText, { marginBottom: 20 }]}>
+              Você tem certeza que deseja se desconectar?
+            </Text>
+            <View style={{justifyContent: "space-between", width: "100%" }}>
+              <TouchableOpacity style={[styles.saveButton, { backgroundColor: "#ccc", marginRight: 10, marginBottom: 10 }]} onPress={() => setLogoutModalVisible(false)}>
+                <Text style={[styles.saveButtonText, { color: "#333" }]}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.saveButton, {backgroundColor: "#E53935",}]} onPress={handleLogout}>
+                <Text style={styles.saveButtonText}>Desconectar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -98,8 +130,8 @@ const styles = StyleSheet.create({
   container: { padding: 20, alignItems: "center", backgroundColor: "#fff" },
   header: { flexDirection: "row", backgroundColor: "#F5F5F5", borderRadius: 12, padding: 15, marginBottom: 20, width: "100%", alignItems: "center" },
   avatarBox: { alignItems: "center", marginRight: 15 },
-  avatar: { width: 100, height: 100, borderRadius: 40, marginBottom: 4 },
-  userName: { fontWeight: "600", fontSize: 18, textAlign: "center" },
+  avatar: { width: 100, height: 90, borderRadius: 40, marginBottom: 4 },
+  userName: { fontWeight: "600", fontSize: 16, textAlign: "center" },
   infoBox: { flex: 1, padding: 20, backgroundColor: "#fff", borderRadius: 10 },
   title: { fontSize: 24, marginBottom: 10, fontWeight: 'bold' },
   label: { fontSize: 14, marginBottom: 5 },
@@ -115,11 +147,23 @@ const styles = StyleSheet.create({
   logoutText: { color: "#fff", fontWeight: "bold" },
   modalBackground: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
   modalContainer: { width: "85%", backgroundColor: "#fff", padding: 25, borderRadius: 15, alignItems: "center" },
-  closeButton: { position: "absolute", top: 10, right: 10 },
+  closeButton: {
+    position: "absolute",
+    top: 14,
+    right: 14,
+    backgroundColor: "#f2f2f2",
+    borderRadius: 20,
+    padding: 6,
+    elevation: 4, // sombra no Android
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
   closeText: { fontSize: 18, fontWeight: "bold" },
   modalTitle: { fontSize: 26, fontWeight: "bold", marginBottom: 20, textAlign: "center" },
   modalLabel: { alignSelf: "flex-start", marginBottom: 5, fontWeight: "600" },
   input: { width: "100%", borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 12, marginBottom: 15 },
-  saveButton: { backgroundColor: "#0C254E", paddingVertical: 15, paddingHorizontal: 40, borderRadius: 25, alignItems: "center", width: "100%" },
+  saveButton: { backgroundColor: "#0C254E", paddingVertical: 12, paddingHorizontal: 36, borderRadius: 16, alignItems: "center", width: "100%" },
   saveButtonText: { color: "#fff", fontWeight: "bold", fontSize: 16, textAlign: "center" },
 });

@@ -13,50 +13,30 @@ import {
   Modal,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation } from "@react-navigation/native";
 
-export default function Login({ }) {
+export default function EsqueceuSenha({ navigation }) {
   const [cpf, setCpf] = useState("");
-  const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [modalErrorVisible, setModalErrorVisible] = useState(false);
-  const [modalSuccessVisible, setModalSuccessVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const handleLogin = () => {
+  const handleSendReset = () => {
     setError("");
 
     if (!cpf) {
       setError("Informe o CPF.");
-      setModalErrorVisible(true);
-      return;
-    }
-    if (!senha) {
-      setError("Informe a senha.");
-      setModalErrorVisible(true);
+      setModalVisible(true);
       return;
     }
 
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      if (cpf === "1234" && senha === "123qwe") {
-        setModalSuccessVisible(true);
-        setCpf("");
-        setSenha("");
-      } else {
-        setError("CPF ou senha incorretos.");
-        setModalErrorVisible(true);
-      }
+      setModalVisible(true);
+      setError(`Se fosse real, um link de redefinição seria enviado para o CPF ${cpf}.`);
+      setCpf("");
     }, 900);
   };
-
-  const handleSuccessConfirm = () => {
-    setModalSuccessVisible(false);
-    navigation.navigate("MainTabs");
-  };
-
-  const navigation = useNavigation();
 
   return (
     <LinearGradient
@@ -75,11 +55,10 @@ export default function Login({ }) {
             style={styles.logo}
             resizeMode="contain"
           />
-          <Text style={styles.title}>Bem-vindo de volta!</Text>
+          <Text style={styles.title}>Redefinir senha</Text>
         </View>
 
         <View style={styles.formContainer}>
-          {/* CPF */}
           <View style={styles.inputWrapper}>
             <Text style={styles.label}>CPF</Text>
             <TextInput
@@ -92,74 +71,39 @@ export default function Login({ }) {
             />
           </View>
 
-          {/* Senha */}
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>Senha</Text>
-            <TextInput
-              placeholder="Digite sua senha"
-              placeholderTextColor="#B0B0B0"
-              style={styles.input}
-              secureTextEntry
-              value={senha}
-              onChangeText={setSenha}
-            />
-          </View>
-
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => navigation.navigate("EsqueceuSenha")}
-          >
-            <Text style={styles.forgotPassword}>Esqueceu a senha?</Text>
-          </TouchableOpacity>
-
-
           <TouchableOpacity
             style={styles.button}
             activeOpacity={0.8}
-            onPress={handleLogin}
+            onPress={handleSendReset}
             disabled={loading}
           >
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Entrar</Text>}
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Enviar link</Text>}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{ marginTop: 15 }}
+          >
+            <Text style={styles.backLogin}>Voltar para login</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Modal de erro */}
+        {/* Modal de aviso */}
         <Modal
-          visible={modalErrorVisible}
+          visible={modalVisible}
           transparent
           animationType="slide"
-          onRequestClose={() => setModalErrorVisible(false)}
+          onRequestClose={() => setModalVisible(false)}
         >
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Ops!</Text>
+              <Text style={styles.modalTitle}>{error.includes("CPF") ? "Ops!" : "Sucesso!"}</Text>
               <Text style={styles.modalMessage}>{error}</Text>
               <TouchableOpacity
                 style={styles.modalButton}
-                onPress={() => setModalErrorVisible(false)}
+                onPress={() => setModalVisible(false)}
               >
                 <Text style={styles.modalButtonText}>Fechar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-
-        {/* Modal de sucesso */}
-        <Modal
-          visible={modalSuccessVisible}
-          transparent
-          animationType="slide"
-          onRequestClose={handleSuccessConfirm}
-        >
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Sucesso!</Text>
-              <Text style={styles.modalMessage}>Login realizado com sucesso.</Text>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={handleSuccessConfirm}
-              >
-                <Text style={styles.modalButtonText}>Ok</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -169,6 +113,7 @@ export default function Login({ }) {
     </LinearGradient>
   );
 }
+
 const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
@@ -193,9 +138,9 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
   },
-  forgotPassword: { color: '#A0C4FF', marginBottom: 20, textDecorationLine: 'underline', alignSelf: 'flex-end' },
   button: { width: '100%', backgroundColor: '#1A73E8', padding: 16, borderRadius: 12, alignItems: 'center' },
   buttonText: { color: '#FFF', fontWeight: 'bold', fontSize: 18, letterSpacing: 1 },
+  backLogin: { color: '#A0C4FF', textDecorationLine: 'underline', marginTop: 10 },
 
   // Modal
   modalBackground: {

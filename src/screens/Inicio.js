@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from "react-native";
 import Header from "../components/Header";
 import { LineChart, BarChart, PieChart } from "react-native-chart-kit";
+import { useNavigation } from "@react-navigation/native";
 
 const screenWidth = Dimensions.get("window").width - 70;
 
@@ -22,6 +23,8 @@ export default function Inicio() {
     decimalPlaces: 0,
     style: { borderRadius: 16 },
   };
+
+  const navigation = useNavigation();
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -101,17 +104,24 @@ export default function Inicio() {
         <Text style={styles.text}>
           Acompanhe análises da IA sobre o desempenho das máquinas, descubra oportunidades de eficiência e recomendações de sustentabilidade para reduzir custos e impacto ambiental.
         </Text>
-        <Pressable style={({ pressed }) => [styles.button, { opacity: pressed ? 0.8 : 1 }]}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Relatorios")}
+        >
           <Text style={styles.buttonText}>Ver Relatórios</Text>
-        </Pressable>
+        </TouchableOpacity>
 
         <Text style={styles.miniTitle}>Está tendo dificuldades?</Text>
         <Text style={styles.text}>
           Precisa de ajuda na realização de alguma tarefa específica? Fale com nosso Chat-Bot!
         </Text>
-        <Pressable style={({ pressed }) => [styles.buttonSecondary, { opacity: pressed ? 0.8 : 1 }]}>
-          <Text style={styles.buttonText}>Falar com o Chat-bot</Text>
-        </Pressable>
+        <TouchableOpacity
+          style={styles.buttonSecondary}
+          onPress={() => navigation.navigate("ChatBot")}
+        >
+          <Text style={styles.buttonText}>Falar com o Chat-Bot</Text>
+        </TouchableOpacity>
+
       </ScrollView>
     </View>
   );
@@ -145,7 +155,7 @@ const styles = StyleSheet.create({
   cardDate: { fontSize: 12, color: "#ddd" },
 
   graphCard: { backgroundColor: "#012d5c", padding: 18, borderRadius: 16, marginTop: 14, marginBottom: 20, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 5, elevation: 3 },
-  cardTitle: { color: "#fff", fontWeight: "600", fontSize: 20, marginBottom: 14, textAlign: "center" },
+  cardTitle: { color: "#fff", fontWeight: "600", fontSize: 20, marginBottom: 14, textAlign: "center", paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: "#075ee0ff" },
 
   prodRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 16 },
   prodCard: {
