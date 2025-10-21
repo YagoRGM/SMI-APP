@@ -18,6 +18,8 @@ import Relatorios from '../screens/Relatorios';
 import ChatBot from '../screens/ChatBot';
 import Login from '../screens/Login';
 import EsqueceuSenha from '../screens/Esqueceu_senha';
+import DadosMaquina from '../screens/Dados_Maquina';
+import DadosGerais from '../screens/Dados_Gerais';
 
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -94,6 +96,8 @@ export default function Routes() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Inicio" component={Inicio} />
         <Stack.Screen name="EsqueceuSenha" component={EsqueceuSenha} />
+        <Stack.Screen name="DadosMaquina" component={DadosMaquina} />
+        <Stack.Screen name="DadosGerais" component={DadosGerais} />
       </Stack.Navigator>
     </NavigationContainer>
   );
