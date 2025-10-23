@@ -1,99 +1,131 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Modal, TextInput, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ScrollView,
+  Modal,
+  TextInput,
+  Alert,
+} from "react-native";
 import Header from "../components/Header";
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 
 export default function Perfil({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [nome, setNome] = useState("Lucas Machado");
   const [email, setEmail] = useState("lukzinisback@gmail.com");
-  
+
   const salvarEdicao = () => {
     setModalVisible(false);
     Alert.alert("Sucesso", "Perfil editado com sucesso!");
   };
-  
-  const certificacoes = ['NR-10', 'NR-15', 'NR-35', 'NR-42'];
-  
+
   const handleLogout = () => {
     setLogoutModalVisible(false);
-    navigation.navigate('Login'); // redireciona para a tela de Login
+    navigation.navigate("Login");
   };
 
   return (
     <View style={styles.view}>
       <Header />
       <ScrollView contentContainerStyle={styles.container}>
-
-        {/* Cabeçalho */}
+        {/* === CARD DE PERFIL === */}
         <View style={styles.header}>
-          <View style={styles.avatarBox}>
-            <Image source={require("../assets/img/avatar.png")} style={styles.avatar} />
-            <Text style={styles.userName}>{nome}</Text>
-          </View>
-
+          <Image
+            source={require("../assets/img/avatar.png")}
+            style={styles.avatar}
+          />
           <View style={styles.infoBox}>
-            <Text style={styles.title}>Meu Perfil</Text>
-
-            <Text style={styles.label}><Text style={styles.bold}>Nome: </Text>{nome}</Text>
-            <Text style={styles.label}><Text style={styles.bold}>ID: </Text>004589</Text>
-            <Text style={styles.label}><Text style={styles.bold}>Email: </Text>{email}</Text>
-            <Text style={styles.label}><Text style={styles.bold}>Profissão: </Text>Soldador</Text>
-            <Text style={styles.label}><Text style={styles.bold}>Status: </Text>Férias</Text>
-            <Text style={styles.label}><Text style={styles.bold}>Turno: </Text>Manhã</Text>
-            <Text style={styles.label}><Text style={styles.bold}>Supervisor: </Text>Craque Neto</Text>
+            <Text style={styles.userName}>{nome}</Text>
+            <Text style={styles.userEmail}>{email}</Text>
           </View>
         </View>
 
-        {/* Certificações */}
-        <Text style={styles.sectionTitle}>Certificações / Treinamentos concluídos</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 30 }}>
-          {certificacoes.map((cert, index) => (
-            <LinearGradient
-              key={index}
-              colors={['#001943', '#003FA9']}
-              style={styles.certCard}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <Text style={styles.certText}>{cert}</Text>
-            </LinearGradient>
-          ))}
-        </ScrollView>
+        {/* === CARD DE INFORMAÇÕES PESSOAIS === */}
+        <View style={styles.infoCard}>
+          <Text style={styles.cardTitle}>Informações Pessoais</Text>
+          <View style={styles.divider} />
+          <Text style={styles.infoLabel}>
+            <Text style={styles.bold}>ID: </Text>004589
+          </Text>
+          <Text style={styles.infoLabel}>
+            <Text style={styles.bold}>Profissão: </Text>Soldador
+          </Text>
+          <Text style={styles.infoLabel}>
+            <Text style={styles.bold}>Status: </Text>Férias
+          </Text>
+          <Text style={styles.infoLabel}>
+            <Text style={styles.bold}>Turno: </Text>Manhã
+          </Text>
+          <Text style={styles.infoLabel}>
+            <Text style={styles.bold}>Supervisor: </Text>Craque Neto
+          </Text>
+        </View>
 
-        {/* Botões */}
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.editButton} onPress={() => setModalVisible(true)}>
-            <Text style={styles.editText}>Editar</Text>
+        {/* === BOTÕES === */}
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: "#0C254E" }]}
+            onPress={() => setModalVisible(true)}
+          >
+            <Ionicons name="pencil" size={20} color="#fff" />
+            <Text style={styles.actionText}>Editar Perfil</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.logoutButton} onPress={() => setLogoutModalVisible(true)}>
-            <Text style={styles.logoutText}>Desconectar</Text>
+
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: "#007B83" }]}
+            onPress={() => navigation.navigate("GerenciarUsuarios")}
+          >
+            <Ionicons name="people" size={20} color="#fff" />
+            <Text style={styles.actionText}>Gerenciar Usuários</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: "#E53935" }]}
+            onPress={() => setLogoutModalVisible(true)}
+          >
+            <Ionicons name="log-out-outline" size={20} color="#fff" />
+            <Text style={styles.actionText}>Desconectar</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-      {/* Modal de edição */}
-      <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
+      {/* === MODAL DE EDIÇÃO === */}
+      <Modal
+        animationType="slide"
+        transparent
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}
             >
-              <Ionicons name="close" size={26} color="#333" />
+              <Ionicons name="close" size={24} color="#333" />
             </TouchableOpacity>
 
             <Text style={styles.modalTitle}>Editar Perfil</Text>
 
             <Text style={styles.modalLabel}>Nome</Text>
-            <TextInput style={styles.input} value={nome} onChangeText={setNome} />
+            <TextInput
+              style={styles.input}
+              value={nome}
+              onChangeText={setNome}
+            />
 
             <Text style={styles.modalLabel}>Email</Text>
-            <TextInput style={styles.input} value={email} onChangeText={setEmail} keyboardType="email-address" />
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
 
             <TouchableOpacity style={styles.saveButton} onPress={salvarEdicao}>
               <Text style={styles.saveButtonText}>Salvar Alterações</Text>
@@ -102,19 +134,32 @@ export default function Perfil({ navigation }) {
         </View>
       </Modal>
 
-      {/* Modal de confirmação de logout */}
-      <Modal animationType="fade" transparent={true} visible={logoutModalVisible} onRequestClose={() => setLogoutModalVisible(false)}>
+      {/* === MODAL DE LOGOUT === */}
+      <Modal
+        animationType="fade"
+        transparent
+        visible={logoutModalVisible}
+        onRequestClose={() => setLogoutModalVisible(false)}
+      >
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Confirmação</Text>
             <Text style={[styles.modalText, { marginBottom: 20 }]}>
               Você tem certeza que deseja se desconectar?
             </Text>
-            <View style={{justifyContent: "space-between", width: "100%" }}>
-              <TouchableOpacity style={[styles.saveButton, { backgroundColor: "#ccc", marginRight: 10, marginBottom: 10 }]} onPress={() => setLogoutModalVisible(false)}>
-                <Text style={[styles.saveButtonText, { color: "#333" }]}>Cancelar</Text>
+            <View style={{ width: "100%" }}>
+              <TouchableOpacity
+                style={[styles.saveButton, { backgroundColor: "#ccc" }]}
+                onPress={() => setLogoutModalVisible(false)}
+              >
+                <Text style={[styles.saveButtonText, { color: "#333" }]}>
+                  Cancelar
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.saveButton, {backgroundColor: "#E53935",}]} onPress={handleLogout}>
+              <TouchableOpacity
+                style={[styles.saveButton, { backgroundColor: "#E53935" }]}
+                onPress={handleLogout}
+              >
                 <Text style={styles.saveButtonText}>Desconectar</Text>
               </TouchableOpacity>
             </View>
@@ -126,44 +171,120 @@ export default function Perfil({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  view: { flex: 1 },
-  container: { padding: 20, alignItems: "center", backgroundColor: "#fff" },
-  header: { flexDirection: "row", backgroundColor: "#F5F5F5", borderRadius: 12, padding: 15, marginBottom: 20, width: "100%", alignItems: "center" },
-  avatarBox: { alignItems: "center", marginRight: 15 },
-  avatar: { width: 100, height: 90, borderRadius: 40, marginBottom: 4 },
-  userName: { fontWeight: "600", fontSize: 16, textAlign: "center" },
-  infoBox: { flex: 1, padding: 20, backgroundColor: "#fff", borderRadius: 10 },
-  title: { fontSize: 24, marginBottom: 10, fontWeight: 'bold' },
-  label: { fontSize: 14, marginBottom: 5 },
-  bold: { fontWeight: 'bold' },
-  value: { fontWeight: 'normal', fontSize: 13 },
-  sectionTitle: { fontSize: 22, fontWeight: "600", marginBottom: 10, color: "#0C254E", textAlign: "center" },
-  certCard: { width: 120, paddingVertical: 20, marginHorizontal: 5, borderRadius: 10, alignItems: "center", justifyContent: "center" },
-  certText: { color: "#fff", fontWeight: "600", fontSize: 16 },
-  buttonRow: { flexDirection: "row", justifyContent: "space-between", width: "100%" },
-  editButton: { flex: 1, backgroundColor: "#0C254E", paddingVertical: 12, borderRadius: 25, alignItems: "center", marginRight: 10 },
-  editText: { color: "#fff", fontWeight: "bold" },
-  logoutButton: { flex: 1, backgroundColor: "#E53935", paddingVertical: 12, borderRadius: 25, alignItems: "center", marginLeft: 10 },
-  logoutText: { color: "#fff", fontWeight: "bold" },
-  modalBackground: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
-  modalContainer: { width: "85%", backgroundColor: "#fff", padding: 25, borderRadius: 15, alignItems: "center" },
-  closeButton: {
-    position: "absolute",
-    top: 14,
-    right: 14,
-    backgroundColor: "#f2f2f2",
-    borderRadius: 20,
-    padding: 6,
-    elevation: 4, // sombra no Android
+  view: { flex: 1, backgroundColor: "#fff" },
+  container: { padding: 20, alignItems: "center" },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F3F4F6",
+    borderRadius: 12,
+    padding: 15,
+    width: "100%",
+    marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  closeText: { fontSize: 18, fontWeight: "bold" },
-  modalTitle: { fontSize: 26, fontWeight: "bold", marginBottom: 20, textAlign: "center" },
+  avatar: { width: 90, height: 90, borderRadius: 45 },
+  infoBox: { marginLeft: 15 },
+  userName: { fontSize: 20, fontWeight: "bold", color: "#0C254E" },
+  userEmail: { fontSize: 14, color: "#555" },
+
+  infoCard: {
+    width: "100%",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 4,
+    marginBottom: 25,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#0C254E",
+    marginBottom: 10,
+  },
+  divider: {
+    width: "100%",
+    height: 1,
+    backgroundColor: "#E0E0E0",
+    marginBottom: 10,
+  },
+  infoLabel: { fontSize: 15, color: "#333", marginBottom: 6 },
+  bold: { fontWeight: "bold" },
+
+  buttonsContainer: { width: "100%", gap: 12, marginBottom: 30 },
+  actionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  actionText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
+    marginLeft: 8,
+  },
+
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContainer: {
+    width: "85%",
+    backgroundColor: "#fff",
+    padding: 25,
+    borderRadius: 15,
+    alignItems: "center",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    backgroundColor: "#eee",
+    borderRadius: 20,
+    padding: 5,
+  },
+  modalTitle: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
   modalLabel: { alignSelf: "flex-start", marginBottom: 5, fontWeight: "600" },
-  input: { width: "100%", borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 12, marginBottom: 15 },
-  saveButton: { backgroundColor: "#0C254E", paddingVertical: 12, paddingHorizontal: 36, borderRadius: 16, alignItems: "center", width: "100%" },
-  saveButtonText: { color: "#fff", fontWeight: "bold", fontSize: 16, textAlign: "center" },
+  input: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 15,
+  },
+  saveButton: {
+    backgroundColor: "#0C254E",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 10,
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+  modalText: { fontSize: 16, color: "#333", textAlign: "center" },
 });

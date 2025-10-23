@@ -17,9 +17,11 @@ import CadastrarMaquina from '../screens/Cadastrar_Maquina';
 import Relatorios from '../screens/Relatorios';
 import ChatBot from '../screens/ChatBot';
 import Login from '../screens/Login';
+import CadastrarUsuario from '../screens/Cadastrar_Usuario';
 import EsqueceuSenha from '../screens/Esqueceu_senha';
 import DadosMaquina from '../screens/Dados_Maquina';
 import DadosGerais from '../screens/Dados_Gerais';
+import GerenciarUsuarios from '../screens/Gerenciar_Usuarios';
 
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -98,6 +100,8 @@ export default function Routes() {
         <Stack.Screen name="EsqueceuSenha" component={EsqueceuSenha} />
         <Stack.Screen name="DadosMaquina" component={DadosMaquina} />
         <Stack.Screen name="DadosGerais" component={DadosGerais} />
+        <Stack.Screen name="GerenciarUsuarios" component={GerenciarUsuarios} />
+        <Stack.Screen name="CadastrarUsuario" component={CadastrarUsuario} />
       </Stack.Navigator>
     </NavigationContainer>
   );
