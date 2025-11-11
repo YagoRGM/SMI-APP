@@ -134,6 +134,6 @@ const styles = StyleSheet.create({
   editBtn: { backgroundColor: "#00c853", padding: 10, borderRadius: 8, marginBottom: 6, marginRight: 12 },
   detailBtn: { backgroundColor: "#075ee0ff", padding: 10, borderRadius: 8, marginRight: 12 },
   btnText: { color: "#fff", fontWeight: "700", alignSelf: "center", fontSize: 14 },
-  fab: { flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: "#075ee0ff", borderRadius: 10, padding: 10, alignSelf: "center", bottom: 20, left: 16, right: 26, elevation: 3, width: 300 },
+  fab: { flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: "#075ee0ff", borderRadius: 10, padding: 13, alignSelf: "center", bottom: 20, left: 2, right: 26, elevation: 3, width: 340 },
   fabText: { color: "#fff", fontWeight: "bold", fontSize: 20, marginLeft: 8 },
 });

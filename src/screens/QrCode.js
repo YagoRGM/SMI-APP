@@ -68,7 +68,7 @@ export default function QrCode() {
           style={styles.closeButton}
           onPress={() => setShowCamera(false)}
         >
-          <Text style={styles.closeButtonText}>⬅️ Voltar</Text>
+          <Text style={styles.closeButtonText}> Voltar</Text>
         </TouchableOpacity>
       </View>
     );
@@ -84,7 +84,7 @@ export default function QrCode() {
 
         {/* Bloco da Câmera */}
         <View style={styles.card}>
-          <Text style={styles.label}>📷 Escanear o código QR da máquina</Text>
+          <Text style={styles.label}>Escanear o código QR da máquina</Text>
           <TouchableOpacity
             style={styles.optionButton}
             onPress={() => setShowCamera(true)}
@@ -98,7 +98,7 @@ export default function QrCode() {
 
         {/* Bloco de Inserção Manual */}
         <View style={styles.card}>
-          <Text style={styles.label}>⌨️ Digite o código da máquina</Text>
+          <Text style={styles.label}>Digite o código da máquina</Text>
           <View style={styles.inputRow}>
             <TextInput
               style={styles.input}

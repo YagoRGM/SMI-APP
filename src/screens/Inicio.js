@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   cardHeader: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
-  cardTitle: { fontSize: 16, fontWeight: "700", color: "#012d5c", marginLeft: 8 },
+  cardTitle: { fontSize: 14, fontWeight: "700", color: "#012d5c", marginLeft: 8 },
   cardDescription: { fontSize: 14, color: "#444", marginBottom: 8 },
   cardLink: { fontSize: 14, color: "#075ee0", fontWeight: "600" },
 

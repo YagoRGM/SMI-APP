@@ -40,7 +40,7 @@ export default function Login({ }) {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      if (cpf === "1234" && senha === "123qwe") {
+      if (cpf === "123" && senha === "123qwe") {
         setModalSuccessVisible(true);
         setCpf("");
         setSenha("");
