@@ -18,14 +18,14 @@ import { useNavigation } from "@react-navigation/native";
 import Header from "../components/Header_stack";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { supabase } from "../config/SupaBaseConfig";
 
 export default function CadastrarUsuario() {
     const [nome, setNome] = useState("");
     const [cpf, setCpf] = useState("");
     const [email, setEmail] = useState("");
-    const [cargo, setCargo] = useState("");
     const [setor, setSetor] = useState("");
-    const [status, setStatus] = useState("Ativo");
+    const [status, setStatus] = useState("ativo");
     const [tipo, setTipo] = useState("Funcionario");
     const [dataAdmissao, setDataAdmissao] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -37,29 +37,71 @@ export default function CadastrarUsuario() {
 
     const navigation = useNavigation();
 
-    const handleCadastrar = () => {
+    const handleCadastrar = async () => {
         setError("");
 
-        if (!nome || !cpf || !email || !cargo || !setor) {
+        // validação
+        if (!nome || !cpf || !email || !setor) {
             setError("Preencha todos os campos obrigatórios.");
             setModalErrorVisible(true);
             return;
         }
 
-        setLoading(true);
-        setTimeout(() => {
+        try {
+            setLoading(true);
+
+            // 1️⃣ Criar usuário no Auth
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email: email,
+                password: "123qwe", // senha provisória — depois ele troca
+            });
+
+            if (authError) {
+                throw authError;
+            }
+
+            const idAuth = authData.user.id;
+
+            // 2️⃣ Converter data admissão para YYYY-MM-DD
+            const isoDate = dataAdmissao.toISOString().split("T")[0];
+
+            // 3️⃣ Inserir na tabela users
+            const { error: insertError } = await supabase
+                .from("users")
+                .insert([
+                    {
+                        id_auth: idAuth,
+                        nome: nome,
+                        cpf: cpf.replace(/\D/g, ""),
+                        email: email,
+                        setor: setor,
+                        status: status,
+                        tipo: tipo,
+                        data_de_admissao: isoDate,
+                    },
+                ]);
+
+            if (insertError) {
+                throw insertError;
+            }
+
             setLoading(false);
             setModalSuccessVisible(true);
-            // reset fields
+
+            // reset
             setNome("");
             setCpf("");
             setEmail("");
-            setCargo("");
             setSetor("");
             setStatus("Ativo");
             setTipo("Funcionario");
             setDataAdmissao(new Date());
-        }, 900);
+
+        } catch (err) {
+            setLoading(false);
+            setError(err.message || "Erro inesperado.");
+            setModalErrorVisible(true);
+        }
     };
 
     const handleSuccessConfirm = () => {
@@ -82,186 +124,174 @@ export default function CadastrarUsuario() {
                 keyboardShouldPersistTaps="handled"
             >
 
-                    <LinearGradient
-                        colors={["#0B2D5F", "#1A3E7C", "#183C70"]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.gradient}
-                    >
-                        <View style={styles.formContainer}>
-                            <Text style={styles.title}>Cadastrar Usuário</Text>
+                <LinearGradient
+                    colors={["#0B2D5F", "#1A3E7C", "#183C70"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.gradient}
+                >
+                    <View style={styles.formContainer}>
+                        <Text style={styles.title}>Cadastrar Usuário</Text>
 
-                            {/* Nome */}
-                            <View style={styles.inputWrapper}>
-                                <Text style={styles.label}>Nome</Text>
-                                <TextInput
-                                    placeholder="Digite o nome"
-                                    placeholderTextColor="#B0B0B0"
-                                    style={styles.input}
-                                    value={nome}
-                                    onChangeText={setNome}
-                                    returnKeyType="next"
-                                />
-                            </View>
+                        {/* Nome */}
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>Nome</Text>
+                            <TextInput
+                                placeholder="Digite o nome"
+                                placeholderTextColor="#B0B0B0"
+                                style={styles.input}
+                                value={nome}
+                                onChangeText={setNome}
+                                returnKeyType="next"
+                            />
+                        </View>
 
-                            {/* CPF */}
-                            <View style={styles.inputWrapper}>
-                                <Text style={styles.label}>CPF</Text>
-                                <TextInput
-                                    placeholder="Digite o CPF"
-                                    placeholderTextColor="#B0B0B0"
-                                    style={styles.input}
-                                    keyboardType="numeric"
-                                    value={cpf}
-                                    onChangeText={setCpf}
-                                    returnKeyType="next"
-                                />
-                            </View>
+                        {/* CPF */}
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>CPF</Text>
+                            <TextInput
+                                placeholder="Digite o CPF"
+                                placeholderTextColor="#B0B0B0"
+                                style={styles.input}
+                                keyboardType="numeric"
+                                value={cpf}
+                                onChangeText={setCpf}
+                                returnKeyType="next"
+                            />
+                        </View>
 
-                            {/* Email */}
-                            <View style={styles.inputWrapper}>
-                                <Text style={styles.label}>Email</Text>
-                                <TextInput
-                                    placeholder="Digite o email"
-                                    placeholderTextColor="#B0B0B0"
-                                    style={styles.input}
-                                    keyboardType="email-address"
-                                    autoCapitalize="none"
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    returnKeyType="next"
-                                />
-                            </View>
+                        {/* Email */}
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>Email</Text>
+                            <TextInput
+                                placeholder="Digite o email"
+                                placeholderTextColor="#B0B0B0"
+                                style={styles.input}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                value={email}
+                                onChangeText={setEmail}
+                                returnKeyType="next"
+                            />
+                        </View>
 
-                            {/* Cargo */}
-                            <View style={styles.inputWrapper}>
-                                <Text style={styles.label}>Cargo</Text>
-                                <TextInput
-                                    placeholder="Digite o cargo"
-                                    placeholderTextColor="#B0B0B0"
-                                    style={styles.input}
-                                    value={cargo}
-                                    onChangeText={setCargo}
-                                    returnKeyType="next"
-                                />
-                            </View>
+                        {/* Setor */}
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>Setor</Text>
+                            <TextInput
+                                placeholder="Digite o setor"
+                                placeholderTextColor="#B0B0B0"
+                                style={styles.input}
+                                value={setor}
+                                onChangeText={setSetor}
+                                returnKeyType="next"
+                            />
+                        </View>
 
-                            {/* Setor */}
-                            <View style={styles.inputWrapper}>
-                                <Text style={styles.label}>Setor</Text>
-                                <TextInput
-                                    placeholder="Digite o setor"
-                                    placeholderTextColor="#B0B0B0"
-                                    style={styles.input}
-                                    value={setor}
-                                    onChangeText={setSetor}
-                                    returnKeyType="next"
-                                />
-                            </View>
-
-                            {/* Status */}
-                            <View style={styles.inputWrapper}>
-                                <Text style={styles.label}>Status</Text>
-                                <View style={[styles.input, { borderRadius: 10, paddingHorizontal: 0, height: 48, justifyContent: 'center' }]}>
-                                    <Picker
-                                        selectedValue={status}
-                                        onValueChange={(itemValue) => setStatus(itemValue)}
-                                        style={{ color: '#FFF', width: '100%' }}
-                                        dropdownIconColor="#FFF"
-                                    >
-                                        <Picker.Item label="Ativo" value="Ativo" />
-                                        <Picker.Item label="Inativo" value="Inativo" />
-                                    </Picker>
-                                </View>
-                            </View>
-
-                            {/* Tipo de Usuário */}
-                            <View style={styles.inputWrapper}>
-                                <Text style={styles.label}>Tipo de Usuário</Text>
-                                <View style={[styles.input, { borderRadius: 10, paddingHorizontal: 0, height: 48, justifyContent: 'center' }]}>
-                                    <Picker
-                                        selectedValue={tipo}
-                                        onValueChange={(itemValue) => setTipo(itemValue)}
-                                        style={{ color: '#FFF', width: '100%' }}
-                                        dropdownIconColor="#FFF"
-                                    >
-                                        <Picker.Item label="Administrador" value="Administrador" />
-                                        <Picker.Item label="Funcionario" value="Funcionario" />
-                                    </Picker>
-                                </View>
-                            </View>
-
-                            {/* Data de Admissão */}
-                            <View style={styles.inputWrapper}>
-                                <Text style={styles.label}>Data de Admissão</Text>
-                                <TouchableOpacity
-                                    style={[styles.input, styles.dateButton]}
-                                    onPress={() => setShowDatePicker(true)}
+                        {/* Status */}
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>Status</Text>
+                            <View style={[styles.input, { borderRadius: 10, paddingHorizontal: 0, height: 48, justifyContent: 'center' }]}>
+                                <Picker
+                                    selectedValue={status}
+                                    onValueChange={(itemValue) => setStatus(itemValue)}
+                                    style={{ color: '#FFF', width: '100%' }}
+                                    dropdownIconColor="#FFF"
                                 >
-                                    <Text style={styles.dateText}>{dataAdmissao.toLocaleDateString()}</Text>
-                                </TouchableOpacity>
-
-                                {showDatePicker && (
-                                    <DateTimePicker
-                                        value={dataAdmissao}
-                                        mode="date"
-                                        display={Platform.OS === "ios" ? "spinner" : "default"}
-                                        onChange={onChangeDate}
-                                        maximumDate={new Date(2100, 12, 31)}
-                                    />
-                                )}
+                                    <Picker.Item label="Ativo" value="ativo" />
+                                    <Picker.Item label="Inativo" value="inativo" />
+                                </Picker>
                             </View>
+                        </View>
 
+                        {/* Tipo de Usuário */}
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>Tipo de Usuário</Text>
+                            <View style={[styles.input, { borderRadius: 10, paddingHorizontal: 0, height: 48, justifyContent: 'center' }]}>
+                                <Picker
+                                    selectedValue={tipo}
+                                    onValueChange={(itemValue) => setTipo(itemValue)}
+                                    style={{ color: '#FFF', width: '100%' }}
+                                    dropdownIconColor="#FFF"
+                                >
+                                    <Picker.Item label="Administrador" value="Administrador" />
+                                    <Picker.Item label="Funcionário" value="Funcionario" />
+
+                                </Picker>
+                            </View>
+                        </View>
+
+                        {/* Data de Admissão */}
+                        <View style={styles.inputWrapper}>
+                            <Text style={styles.label}>Data de Admissão</Text>
                             <TouchableOpacity
-                                style={styles.button}
-                                activeOpacity={0.85}
-                                onPress={handleCadastrar}
-                                disabled={loading}
+                                style={[styles.input, styles.dateButton]}
+                                onPress={() => setShowDatePicker(true)}
                             >
-                                {loading ? (
-                                    <ActivityIndicator color="#fff" />
-                                ) : (
-                                    <Text style={styles.buttonText}>Cadastrar</Text>
-                                )}
+                                <Text style={styles.dateText}>{dataAdmissao.toLocaleDateString()}</Text>
+                            </TouchableOpacity>
+
+                            {showDatePicker && (
+                                <DateTimePicker
+                                    value={dataAdmissao}
+                                    mode="date"
+                                    display={Platform.OS === "ios" ? "spinner" : "default"}
+                                    onChange={onChangeDate}
+                                    maximumDate={new Date(2100, 12, 31)}
+                                />
+                            )}
+                        </View>
+
+                        <TouchableOpacity
+                            style={styles.button}
+                            activeOpacity={0.85}
+                            onPress={handleCadastrar}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <ActivityIndicator color="#fff" />
+                            ) : (
+                                <Text style={styles.buttonText}>Cadastrar</Text>
+                            )}
+                        </TouchableOpacity>
+                    </View>
+                </LinearGradient>
+
+                {/* Modal de erro */}
+                <Modal
+                    visible={modalErrorVisible}
+                    transparent
+                    animationType="slide"
+                    onRequestClose={() => setModalErrorVisible(false)}
+                >
+                    <View style={styles.modalBackground}>
+                        <View style={styles.modalContainer}>
+                            <Text style={styles.modalTitle}>Ops!</Text>
+                            <Text style={styles.modalMessage}>{error}</Text>
+                            <TouchableOpacity style={styles.modalButton} onPress={() => setModalErrorVisible(false)}>
+                                <Text style={styles.modalButtonText}>Fechar</Text>
                             </TouchableOpacity>
                         </View>
-                    </LinearGradient>
+                    </View>
+                </Modal>
 
-                    {/* Modal de erro */}
-                    <Modal
-                        visible={modalErrorVisible}
-                        transparent
-                        animationType="slide"
-                        onRequestClose={() => setModalErrorVisible(false)}
-                    >
-                        <View style={styles.modalBackground}>
-                            <View style={styles.modalContainer}>
-                                <Text style={styles.modalTitle}>Ops!</Text>
-                                <Text style={styles.modalMessage}>{error}</Text>
-                                <TouchableOpacity style={styles.modalButton} onPress={() => setModalErrorVisible(false)}>
-                                    <Text style={styles.modalButtonText}>Fechar</Text>
-                                </TouchableOpacity>
-                            </View>
+                {/* Modal de sucesso */}
+                <Modal
+                    visible={modalSuccessVisible}
+                    transparent
+                    animationType="slide"
+                    onRequestClose={handleSuccessConfirm}
+                >
+                    <View style={styles.modalBackground}>
+                        <View style={styles.modalContainer}>
+                            <Text style={styles.modalTitle}>Sucesso!</Text>
+                            <Text style={styles.modalMessage}>Usuário cadastrado com sucesso.</Text>
+                            <TouchableOpacity style={styles.modalButton} onPress={handleSuccessConfirm}>
+                                <Text style={styles.modalButtonText}>Ok</Text>
+                            </TouchableOpacity>
                         </View>
-                    </Modal>
-
-                    {/* Modal de sucesso */}
-                    <Modal
-                        visible={modalSuccessVisible}
-                        transparent
-                        animationType="slide"
-                        onRequestClose={handleSuccessConfirm}
-                    >
-                        <View style={styles.modalBackground}>
-                            <View style={styles.modalContainer}>
-                                <Text style={styles.modalTitle}>Sucesso!</Text>
-                                <Text style={styles.modalMessage}>Usuário cadastrado com sucesso.</Text>
-                                <TouchableOpacity style={styles.modalButton} onPress={handleSuccessConfirm}>
-                                    <Text style={styles.modalButtonText}>Ok</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </Modal>
+                    </View>
+                </Modal>
             </ScrollView>
         </SafeAreaView>
     );

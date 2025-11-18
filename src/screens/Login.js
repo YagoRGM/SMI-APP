@@ -14,6 +14,8 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
+import { supabase } from "../config/SupaBaseConfig";
+
 
 export default function Login({ }) {
   const [cpf, setCpf] = useState("");
@@ -23,7 +25,7 @@ export default function Login({ }) {
   const [modalErrorVisible, setModalErrorVisible] = useState(false);
   const [modalSuccessVisible, setModalSuccessVisible] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setError("");
 
     if (!cpf) {
@@ -38,18 +40,50 @@ export default function Login({ }) {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      if (cpf === "123" && senha === "123qwe") {
-        setModalSuccessVisible(true);
-        setCpf("");
-        setSenha("");
-      } else {
-        setError("CPF ou senha incorretos.");
+
+    try {
+      // 1️⃣ Buscar o email pelo CPF
+      const { data: userData, error: cpfError } = await supabase
+        .from("users")
+        .select("email")
+        .eq("cpf", cpf)
+        .single();
+
+      if (cpfError || !userData) {
+        setError("CPF não encontrado.");
         setModalErrorVisible(true);
+        setLoading(false);
+        return;
       }
-    }, 900);
+
+      // 2️⃣ Fazer login usando o email encontrado
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email: userData.email,
+        password: senha,
+      });
+
+      if (loginError) {
+        setError("Senha incorreta.");
+        setModalErrorVisible(true);
+        setLoading(false);
+        return;
+      }
+
+      // 3️⃣ Sucesso!
+      setModalSuccessVisible(true);
+      setCpf("");
+      setSenha("");
+
+    } catch (e) {
+      console.log("LOGIN ERROR:", e);
+      setError(e.message || "Erro inesperado ao tentar logar.");
+      setModalErrorVisible(true);
+    }
+
+
+    setLoading(false);
   };
+
 
   const handleSuccessConfirm = () => {
     setModalSuccessVisible(false);

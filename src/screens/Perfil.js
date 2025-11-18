@@ -12,12 +12,62 @@ import {
 } from "react-native";
 import Header from "../components/Header";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect } from "react";
+import { supabase } from "../config/SupaBaseConfig";
 
 export default function Perfil({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const [nome, setNome] = useState("Lucas Machado");
-  const [email, setEmail] = useState("lukzinisback@gmail.com");
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+
+  const [cpf, setCpf] = useState("");
+  const [setor, setSetor] = useState("");
+  const [tipo, setTipo] = useState("");
+  const [dataAdmissao, setDataAdmissao] = useState("");
+  const [idUser, setIdUser] = useState("");
+
+  useEffect(() => {
+    carregarUsuario();
+  }, []);
+
+  const carregarUsuario = async () => {
+    try {
+      // 1. Pega o usuário autenticado
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !authData.user) {
+        console.log("Erro no Auth:", authError);
+        return;
+      }
+
+      const user = authData.user;
+      setEmail(user.email);
+      setIdUser(user.id);
+
+      // 2. Busca na tabela users
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id_auth", user.id)
+        .single();
+
+      if (error) {
+        console.log("Erro ao buscar user:", error);
+        return;
+      }
+
+      // 3. Coloca no estado
+      setNome(data.nome);
+      setCpf(data.cpf);
+      setSetor(data.setor);
+      setTipo(data.tipo);
+      setDataAdmissao(data.data_de_admissao);
+    } catch (e) {
+      console.log("ERRO GERAL:", e);
+    }
+  };
+
 
   const salvarEdicao = () => {
     setModalVisible(false);
@@ -50,20 +100,25 @@ export default function Perfil({ navigation }) {
           <Text style={styles.cardTitle}>Informações Pessoais</Text>
           <View style={styles.divider} />
           <Text style={styles.infoLabel}>
-            <Text style={styles.bold}>ID: </Text>004589
+            <Text style={styles.bold}>ID: </Text>{idUser}
           </Text>
+
           <Text style={styles.infoLabel}>
-            <Text style={styles.bold}>Profissão: </Text>Soldador
+            <Text style={styles.bold}>CPF: </Text>{cpf}
           </Text>
+
           <Text style={styles.infoLabel}>
-            <Text style={styles.bold}>Status: </Text>Férias
+            <Text style={styles.bold}>Tipo de usuário: </Text>{tipo}
           </Text>
+
           <Text style={styles.infoLabel}>
-            <Text style={styles.bold}>Turno: </Text>Manhã
+            <Text style={styles.bold}>Setor: </Text>{setor}
           </Text>
+
           <Text style={styles.infoLabel}>
-            <Text style={styles.bold}>Supervisor: </Text>Craque Neto
+            <Text style={styles.bold}>Data de Admissão: </Text>{dataAdmissao}
           </Text>
+
         </View>
 
         {/* === BOTÕES === */}
