@@ -40,7 +40,6 @@ export default function CadastrarUsuario() {
     const handleCadastrar = async () => {
         setError("");
 
-        // validação
         if (!nome || !cpf || !email || !setor) {
             setError("Preencha todos os campos obrigatórios.");
             setModalErrorVisible(true);
@@ -50,59 +49,46 @@ export default function CadastrarUsuario() {
         try {
             setLoading(true);
 
-            // 1️⃣ Criar usuário no Auth
+            // 1️⃣ Criar usuário no Supabase Auth
             const { data: authData, error: authError } = await supabase.auth.signUp({
-                email: email,
-                password: "123qwe", // senha provisória — depois ele troca
+                email,
+                password: "123qwe",
             });
 
-            if (authError) {
-                throw authError;
-            }
+            if (authError) throw authError;
 
             const idAuth = authData.user.id;
 
-            // 2️⃣ Converter data admissão para YYYY-MM-DD
             const isoDate = dataAdmissao.toISOString().split("T")[0];
 
-            // 3️⃣ Inserir na tabela users
+            // 2️⃣ Inserir na tabela users (ENUMS corretos!)
             const { error: insertError } = await supabase
                 .from("users")
                 .insert([
                     {
                         id_auth: idAuth,
-                        nome: nome,
+                        nome,
                         cpf: cpf.replace(/\D/g, ""),
-                        email: email,
-                        setor: setor,
-                        status: status,
-                        tipo: tipo,
+                        email,
+                        setor,
+                        status: status,           // já com valor correto
+                        tipo: tipo,               // já com valor correto
                         data_de_admissao: isoDate,
                     },
                 ]);
 
-            if (insertError) {
-                throw insertError;
-            }
+            if (insertError) throw insertError;
 
             setLoading(false);
             setModalSuccessVisible(true);
 
-            // reset
-            setNome("");
-            setCpf("");
-            setEmail("");
-            setSetor("");
-            setStatus("Ativo");
-            setTipo("Funcionario");
-            setDataAdmissao(new Date());
-
         } catch (err) {
             setLoading(false);
-            setError(err.message || "Erro inesperado.");
+            setError(err.message);
             setModalErrorVisible(true);
         }
     };
+
 
     const handleSuccessConfirm = () => {
         setModalSuccessVisible(false);
