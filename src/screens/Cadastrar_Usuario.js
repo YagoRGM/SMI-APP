@@ -7,7 +7,6 @@ import {
     TouchableOpacity,
     StyleSheet,
     Dimensions,
-    KeyboardAvoidingView,
     Platform,
     Modal,
     ActivityIndicator,
@@ -18,16 +17,21 @@ import { useNavigation } from "@react-navigation/native";
 import Header from "../components/Header_stack";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { supabase } from "../config/SupaBaseConfig";
+
+import { criarUsuario } from "../config/cloudflareApi";
 
 export default function CadastrarUsuario() {
     const [nome, setNome] = useState("");
     const [cpf, setCpf] = useState("");
     const [email, setEmail] = useState("");
     const [setor, setSetor] = useState("");
-    const [status, setStatus] = useState("ativo");
-    const [tipo, setTipo] = useState("Funcionario");
+    const [status, setStatus] = useState("ATIVO");
+    const [tipo, setTipo] = useState("FUNCIONARIO");
     const [dataAdmissao, setDataAdmissao] = useState(new Date());
+
+    // senha fixa invisível
+    const [senha, setSenha] = useState("123qwe");
+
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     const [loading, setLoading] = useState(false);
@@ -49,46 +53,33 @@ export default function CadastrarUsuario() {
         try {
             setLoading(true);
 
-            // 1️⃣ Criar usuário no Supabase Auth
-            const { data: authData, error: authError } = await supabase.auth.signUp({
-                email,
-                password: "123qwe",
+            const isoDate = dataAdmissao.toISOString().replace("T", " ").split(".")[0];
+
+            const response = await criarUsuario({
+                nome_usuario: nome,
+                cpf_usuario: cpf,
+                senha_usuario: senha,
+                email_usuario: email,
+                setor_usuario: setor,
+                status_usuario: status,
+                tipo_usuario: tipo,
+                data_admissao: isoDate,
             });
 
-            if (authError) throw authError;
+            if (response.error || response.erro) {
+                throw new Error(response.error || response.erro);
+            }
 
-            const idAuth = authData.user.id;
-
-            const isoDate = dataAdmissao.toISOString().split("T")[0];
-
-            // 2️⃣ Inserir na tabela users (ENUMS corretos!)
-            const { error: insertError } = await supabase
-                .from("users")
-                .insert([
-                    {
-                        id_auth: idAuth,
-                        nome,
-                        cpf: cpf.replace(/\D/g, ""),
-                        email,
-                        setor,
-                        status: status,           // já com valor correto
-                        tipo: tipo,               // já com valor correto
-                        data_de_admissao: isoDate,
-                    },
-                ]);
-
-            if (insertError) throw insertError;
 
             setLoading(false);
             setModalSuccessVisible(true);
 
         } catch (err) {
             setLoading(false);
-            setError(err.message);
+            setError(err.message || "Erro ao cadastrar usuário.");
             setModalErrorVisible(true);
         }
     };
-
 
     const handleSuccessConfirm = () => {
         setModalSuccessVisible(false);
@@ -119,7 +110,6 @@ export default function CadastrarUsuario() {
                     <View style={styles.formContainer}>
                         <Text style={styles.title}>Cadastrar Usuário</Text>
 
-                        {/* Nome */}
                         <View style={styles.inputWrapper}>
                             <Text style={styles.label}>Nome</Text>
                             <TextInput
@@ -128,11 +118,9 @@ export default function CadastrarUsuario() {
                                 style={styles.input}
                                 value={nome}
                                 onChangeText={setNome}
-                                returnKeyType="next"
                             />
                         </View>
 
-                        {/* CPF */}
                         <View style={styles.inputWrapper}>
                             <Text style={styles.label}>CPF</Text>
                             <TextInput
@@ -142,11 +130,9 @@ export default function CadastrarUsuario() {
                                 keyboardType="numeric"
                                 value={cpf}
                                 onChangeText={setCpf}
-                                returnKeyType="next"
                             />
                         </View>
 
-                        {/* Email */}
                         <View style={styles.inputWrapper}>
                             <Text style={styles.label}>Email</Text>
                             <TextInput
@@ -157,11 +143,17 @@ export default function CadastrarUsuario() {
                                 autoCapitalize="none"
                                 value={email}
                                 onChangeText={setEmail}
-                                returnKeyType="next"
                             />
+                            {/* INPUT FIXO DE SENHA */}
+                            <TextInput
+                                value={senha}
+                                secureTextEntry={true}
+                                editable={false}
+                                style={{ opacity: 0, height: 0 }}
+                            />
+
                         </View>
 
-                        {/* Setor */}
                         <View style={styles.inputWrapper}>
                             <Text style={styles.label}>Setor</Text>
                             <TextInput
@@ -170,44 +162,38 @@ export default function CadastrarUsuario() {
                                 style={styles.input}
                                 value={setor}
                                 onChangeText={setSetor}
-                                returnKeyType="next"
                             />
                         </View>
 
-                        {/* Status */}
                         <View style={styles.inputWrapper}>
                             <Text style={styles.label}>Status</Text>
-                            <View style={[styles.input, { borderRadius: 10, paddingHorizontal: 0, height: 48, justifyContent: 'center' }]}>
+                            <View style={styles.pickerBox}>
                                 <Picker
                                     selectedValue={status}
-                                    onValueChange={(itemValue) => setStatus(itemValue)}
-                                    style={{ color: '#FFF', width: '100%' }}
-                                    dropdownIconColor="#FFF"
+                                    onValueChange={setStatus}
+                                    style={styles.picker}
                                 >
-                                    <Picker.Item label="Ativo" value="ativo" />
-                                    <Picker.Item label="Inativo" value="inativo" />
+                                    <Picker.Item label="Ativo" value="ATIVO" />
+                                    <Picker.Item label="Inativo" value="INATIVO" />
+
                                 </Picker>
                             </View>
                         </View>
 
-                        {/* Tipo de Usuário */}
                         <View style={styles.inputWrapper}>
                             <Text style={styles.label}>Tipo de Usuário</Text>
-                            <View style={[styles.input, { borderRadius: 10, paddingHorizontal: 0, height: 48, justifyContent: 'center' }]}>
+                            <View style={styles.pickerBox}>
                                 <Picker
                                     selectedValue={tipo}
-                                    onValueChange={(itemValue) => setTipo(itemValue)}
-                                    style={{ color: '#FFF', width: '100%' }}
-                                    dropdownIconColor="#FFF"
+                                    onValueChange={setTipo}
+                                    style={styles.picker}
                                 >
-                                    <Picker.Item label="Administrador" value="Administrador" />
-                                    <Picker.Item label="Funcionário" value="Funcionario" />
-
+                                    <Picker.Item label="Administrador" value="ADMINISTRADOR" />
+                                    <Picker.Item label="Funcionário" value="FUNCIONARIO" />
                                 </Picker>
                             </View>
                         </View>
 
-                        {/* Data de Admissão */}
                         <View style={styles.inputWrapper}>
                             <Text style={styles.label}>Data de Admissão</Text>
                             <TouchableOpacity
@@ -223,7 +209,6 @@ export default function CadastrarUsuario() {
                                     mode="date"
                                     display={Platform.OS === "ios" ? "spinner" : "default"}
                                     onChange={onChangeDate}
-                                    maximumDate={new Date(2100, 12, 31)}
                                 />
                             )}
                         </View>
@@ -234,22 +219,13 @@ export default function CadastrarUsuario() {
                             onPress={handleCadastrar}
                             disabled={loading}
                         >
-                            {loading ? (
-                                <ActivityIndicator color="#fff" />
-                            ) : (
-                                <Text style={styles.buttonText}>Cadastrar</Text>
-                            )}
+                            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Cadastrar</Text>}
                         </TouchableOpacity>
                     </View>
                 </LinearGradient>
 
-                {/* Modal de erro */}
-                <Modal
-                    visible={modalErrorVisible}
-                    transparent
-                    animationType="slide"
-                    onRequestClose={() => setModalErrorVisible(false)}
-                >
+                {/* Modal Erro */}
+                <Modal visible={modalErrorVisible} transparent animationType="slide">
                     <View style={styles.modalBackground}>
                         <View style={styles.modalContainer}>
                             <Text style={styles.modalTitle}>Ops!</Text>
@@ -261,13 +237,8 @@ export default function CadastrarUsuario() {
                     </View>
                 </Modal>
 
-                {/* Modal de sucesso */}
-                <Modal
-                    visible={modalSuccessVisible}
-                    transparent
-                    animationType="slide"
-                    onRequestClose={handleSuccessConfirm}
-                >
+                {/* Modal Sucesso */}
+                <Modal visible={modalSuccessVisible} transparent animationType="slide">
                     <View style={styles.modalBackground}>
                         <View style={styles.modalContainer}>
                             <Text style={styles.modalTitle}>Sucesso!</Text>
@@ -278,6 +249,7 @@ export default function CadastrarUsuario() {
                         </View>
                     </View>
                 </Modal>
+
             </ScrollView>
         </SafeAreaView>
     );
@@ -287,13 +259,11 @@ const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     safe: { flex: 1, backgroundColor: "#0B2D5F" },
-    scrollContent: { flexGrow: 1, alignItems: "center", paddingVertical: 10 },
-    kav: { width: "100%", alignItems: "center" },
+    scrollContent: { flexGrow: 1, alignItems: "center" },
     gradient: { width: "100%", alignItems: "center", paddingVertical: 20 },
-    title: { color: "#FFF", fontSize: 26, fontWeight: "700", marginBottom: 12, letterSpacing: 0.4 },
+    title: { color: "#FFF", fontSize: 26, fontWeight: "700", marginBottom: 12 },
     formContainer: {
         width: width * 0.92,
-        alignItems: "center",
         padding: 20,
         borderRadius: 16,
         backgroundColor: "rgba(255,255,255,0.06)",
@@ -309,14 +279,25 @@ const styles = StyleSheet.create({
         color: "#FFF",
         fontSize: 16,
     },
+    pickerBox: {
+        backgroundColor: "rgba(255,255,255,0.12)",
+        borderRadius: 10,
+        height: 48,
+        justifyContent: "center",
+    },
+    picker: { color: "#FFF", width: "100%" },
     dateButton: { justifyContent: "center", height: 48 },
     dateText: { color: "#FFF", fontSize: 16 },
-    pickerWrapper: { paddingHorizontal: 8, paddingVertical: 4 },
-    picker: { color: "#FFF", width: "100%" },
-    button: { width: "100%", backgroundColor: "#34A853", padding: 14, borderRadius: 12, alignItems: "center", marginTop: 6 },
+    button: {
+        width: "100%",
+        backgroundColor: "#34A853",
+        padding: 14,
+        borderRadius: 12,
+        alignItems: "center",
+        marginTop: 6,
+    },
     buttonText: { color: "#fff", fontWeight: "700", fontSize: 16 },
 
-    // Modal
     modalBackground: {
         flex: 1,
         backgroundColor: "rgba(0,0,0,0.45)",
@@ -330,8 +311,13 @@ const styles = StyleSheet.create({
         padding: 18,
         alignItems: "center",
     },
-    modalTitle: { fontSize: 20, fontWeight: "700", marginBottom: 8, color: "#0B2D5F" },
-    modalMessage: { fontSize: 15, marginBottom: 14, textAlign: "center", color: "#333" },
-    modalButton: { backgroundColor: "#0B2D5F", paddingVertical: 10, paddingHorizontal: 22, borderRadius: 10 },
+    modalTitle: { fontSize: 20, fontWeight: "700", marginBottom: 8 },
+    modalMessage: { fontSize: 15, marginBottom: 14, textAlign: "center" },
+    modalButton: {
+        backgroundColor: "#0B2D5F",
+        paddingVertical: 10,
+        paddingHorizontal: 22,
+        borderRadius: 10,
+    },
     modalButtonText: { color: "#fff", fontWeight: "700" },
 });

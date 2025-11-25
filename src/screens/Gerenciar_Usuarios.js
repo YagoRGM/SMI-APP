@@ -1,54 +1,93 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
     TouchableOpacity,
-    StyleSheet,
     FlatList,
     Modal,
     TextInput,
+    Alert,
+    StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Header from "../components/Header_stack";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { listarUsuarios, atualizarUsuario, excluirUsuario } from "../config/cloudflareApi";
 
 export default function GerenciarUsuarios() {
-    const [usuarios, setUsuarios] = useState([
-        { id: "1", nome: "Lucas Machado", email: "lucas@gmail.com", cargo: "Administrador" },
-        { id: "2", nome: "Ana Costa", email: "ana.costa@gmail.com", cargo: "Funcionário" },
-        { id: "3", nome: "Pedro Lima", email: "pedro.lima@gmail.com", cargo: "Funcionário" },
-    ]);
-
+    const [usuarios, setUsuarios] = useState([]);
     const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-    const [successModalVisible, setSuccessModalVisible] = useState(false);
-    const [successMessage, setSuccessMessage] = useState("");
+
     const [novoNome, setNovoNome] = useState("");
-    const [novoEmail, setNovoEmail] = useState("");
-    const [novoCargo, setNovoCargo] = useState("");
+    const [novoSetor, setNovoSetor] = useState("");
+    const [novoStatus, setNovoStatus] = useState("ATIVO");
 
     const navigation = useNavigation();
 
+    useEffect(() => {
+        (async () => {
+            const userStr = await AsyncStorage.getItem("@user_data");
+            if (!userStr) return navigation.navigate("Login");
+
+            const userObj = JSON.parse(userStr);
+            const current = userObj.usuario || userObj;
+
+            if (current.tipo_usuario !== "ADMINISTRADOR") {
+                Alert.alert("Acesso negado", "Apenas administradores podem acessar esta tela.");
+                navigation.goBack();
+                return;
+            }
+            carregarUsuarios();
+        })();
+    }, []);
+
+    async function carregarUsuarios() {
+        try {
+            const res = await listarUsuarios();
+            setUsuarios(Array.isArray(res) ? res : []);
+        } catch (e) {
+            Alert.alert("Erro", "Não foi possível carregar usuários.");
+        }
+    }
+
     const abrirEdicao = (usuario) => {
         setUsuarioSelecionado(usuario);
-        setNovoNome(usuario.nome);
-        setNovoEmail(usuario.email);
-        setNovoCargo(usuario.cargo);
+        setNovoNome(usuario.nome_usuario ?? "");
+        setNovoSetor(usuario.setor_usuario ?? "");
+        setNovoStatus(usuario.status_usuario ?? "ATIVO");
         setEditModalVisible(true);
     };
 
-    const salvarEdicao = () => {
-        setUsuarios((prev) =>
-            prev.map((u) =>
-                u.id === usuarioSelecionado.id
-                    ? { ...u, nome: novoNome, email: novoEmail, cargo: novoCargo }
-                    : u
-            )
-        );
-        setEditModalVisible(false);
-        setSuccessMessage("Usuário atualizado com sucesso!");
-        setSuccessModalVisible(true);
+    const salvarEdicao = async () => {
+        if (!usuarioSelecionado) return;
+
+        if (!novoNome.trim() || !novoSetor.trim() || !novoStatus.trim()) {
+            Alert.alert("Erro", "Todos os campos devem estar preenchidos!");
+            return;
+        }
+
+        const updatedUser = {
+            nome_usuario: novoNome,
+            setor_usuario: novoSetor,
+            status_usuario: novoStatus,
+        };
+
+        try {
+            // usa o mesmo padrão que Perfil: retorna JSON
+            const res = await atualizarUsuario(usuarioSelecionado?.id_usuario, updatedUser);
+            if (res.ok && res.json.ok) {
+                // sucesso
+            } else {
+                Alert.alert("Erro", res.json.erro || "Não foi possível atualizar.");
+            }
+
+        } catch (e) {
+            console.log("Erro ao atualizar usuário:", e);
+            Alert.alert("Erro", "Algo deu errado, tente novamente.");
+        }
     };
 
     const confirmarExclusao = (usuario) => {
@@ -56,11 +95,20 @@ export default function GerenciarUsuarios() {
         setDeleteModalVisible(true);
     };
 
-    const excluirUsuario = () => {
-        setUsuarios((prev) => prev.filter((u) => u.id !== usuarioSelecionado.id));
-        setDeleteModalVisible(false);
-        setSuccessMessage("Usuário excluído com sucesso!");
-        setSuccessModalVisible(true);
+    const excluirUsuarioAction = async () => {
+        try {
+            const res = await excluirUsuario(usuarioSelecionado.id_usuario);
+            if (res.ok) {
+                setDeleteModalVisible(false);
+                carregarUsuarios();
+                Alert.alert("Sucesso", "Usuário excluído.");
+            } else {
+                Alert.alert("Erro", res.erro || "Não foi possível excluir.");
+            }
+        } catch (e) {
+            console.log(e);
+            Alert.alert("Erro", "Falha ao excluir usuário.");
+        }
     };
 
     return (
@@ -69,20 +117,23 @@ export default function GerenciarUsuarios() {
             <View style={styles.container}>
                 <Text style={styles.title}>Gerenciar Usuários</Text>
 
-
                 <View style={styles.card}>
                     {usuarios.length === 0 ? (
                         <Text style={styles.emptyMessage}>Nenhum usuário cadastrado.</Text>
                     ) : (
                         <FlatList
                             data={usuarios}
-                            keyExtractor={(item) => item.id}
+                            keyExtractor={(item) => String(item.id_usuario)}
                             renderItem={({ item }) => (
                                 <View style={styles.userItem}>
                                     <View>
-                                        <Text style={styles.userName}>{item.nome}</Text>
-                                        <Text style={styles.userEmail}>{item.email}</Text>
-                                        <Text style={styles.userCargo}>{item.cargo}</Text>
+                                        <Text style={styles.userName}>{item.nome_usuario}</Text>
+                                        <Text style={styles.userEmail}>
+                                            {item.cpf_usuario}
+                                        </Text>
+                                        <Text style={styles.userCargo}>
+                                            {item.tipo_usuario} • {item.status_usuario ?? "ATIVO"}
+                                        </Text>
                                     </View>
                                     <View style={styles.actions}>
                                         <TouchableOpacity
@@ -103,28 +154,24 @@ export default function GerenciarUsuarios() {
                         />
                     )}
                 </View>
-                <View style={{ alignItems: "center", marginTop: 20 }}>
-                    {/* === BOTÃO CADASTRAR USUÁRIO === */}
-                    <TouchableOpacity
-                        style={styles.addButton}
-                        onPress={() => navigation.navigate("CadastrarUsuario")}
-                        activeOpacity={0.8}
-                    >
-                        <Ionicons name="person-add" size={22} color="#fff" style={{ marginRight: 8 }} />
-                        <Text style={styles.addButtonText}>Cadastrar Usuário</Text>
-                    </TouchableOpacity>
-                </View>
-
             </View>
 
-            {/* MODAL DE EDIÇÃO */}
+            <View style={{ alignItems: "center", marginTop: 20 }}>
+                <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() => navigation.navigate("CadastrarUsuario")}
+                    activeOpacity={0.8}
+                >
+                    <Ionicons name="person-add" size={22} color="#fff" style={{ marginRight: 8 }} />
+                    <Text style={styles.addButtonText}>Cadastrar Usuário</Text>
+                </TouchableOpacity>
+            </View>
+
+            {/* MODAL EDIÇÃO */}
             <Modal animationType="slide" transparent visible={editModalVisible}>
                 <View style={styles.modalBackground}>
                     <View style={[styles.modalContainer, { backgroundColor: "#fff" }]}>
-                        <TouchableOpacity
-                            style={styles.closeButton}
-                            onPress={() => setEditModalVisible(false)}
-                        >
+                        <TouchableOpacity style={styles.closeButton} onPress={() => setEditModalVisible(false)}>
                             <Ionicons name="close" size={24} color="#222" />
                         </TouchableOpacity>
 
@@ -139,16 +186,28 @@ export default function GerenciarUsuarios() {
                         />
                         <TextInput
                             style={styles.input}
-                            placeholder="Email"
-                            value={novoEmail}
-                            onChangeText={setNovoEmail}
+                            placeholder="Setor"
+                            value={novoSetor}
+                            onChangeText={setNovoSetor}
                         />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Cargo"
-                            value={novoCargo}
-                            onChangeText={setNovoCargo}
-                        />
+                        <View style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
+                            <TouchableOpacity
+                                style={[styles.statusBtn, novoStatus === "ATIVO" ? styles.statusActive : null]}
+                                onPress={() => setNovoStatus("ATIVO")}
+                            >
+                                <Text style={novoStatus === "ATIVO" ? styles.statusTextActive : styles.statusText}>
+                                    ATIVO
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.statusBtn, novoStatus === "INATIVO" ? styles.statusInactive : null]}
+                                onPress={() => setNovoStatus("INATIVO")}
+                            >
+                                <Text style={novoStatus === "INATIVO" ? styles.statusTextActive : styles.statusText}>
+                                    INATIVO
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
 
                         <TouchableOpacity style={styles.saveButton} onPress={salvarEdicao}>
                             <Text style={styles.saveButtonText}>Salvar Alterações</Text>
@@ -157,15 +216,14 @@ export default function GerenciarUsuarios() {
                 </View>
             </Modal>
 
-            {/* MODAL DE EXCLUSÃO */}
+            {/* MODAL EXCLUIR */}
             <Modal animationType="fade" transparent visible={deleteModalVisible}>
                 <View style={styles.modalBackground}>
                     <View style={[styles.modalContainer, { backgroundColor: "#FFF7F7" }]}>
                         <Ionicons name="warning-outline" size={45} color="#E53935" />
                         <Text style={styles.modalTitle}>Excluir Usuário</Text>
                         <Text style={styles.modalText}>
-                            Deseja realmente excluir{" "}
-                            <Text style={{ fontWeight: "bold" }}>{usuarioSelecionado?.nome}</Text>?
+                            Deseja realmente excluir <Text style={{ fontWeight: "bold" }}>{usuarioSelecionado?.nome_usuario}</Text>?
                         </Text>
 
                         <View style={{ flexDirection: "row", gap: 10 }}>
@@ -177,7 +235,7 @@ export default function GerenciarUsuarios() {
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[styles.saveButton, { backgroundColor: "#E53935", flex: 1 }]}
-                                onPress={excluirUsuario}
+                                onPress={excluirUsuarioAction}
                             >
                                 <Text style={styles.saveButtonText}>Excluir</Text>
                             </TouchableOpacity>
@@ -185,23 +243,7 @@ export default function GerenciarUsuarios() {
                     </View>
                 </View>
             </Modal>
-
-            {/* MODAL DE SUCESSO */}
-            <Modal animationType="fade" transparent visible={successModalVisible}>
-                <View style={styles.modalBackground}>
-                    <View style={[styles.modalContainer, { backgroundColor: "#fff" }]}>
-                        <Ionicons name="checkmark-circle" size={60} color="#34A853" />
-                        <Text style={styles.modalTitle}>{successMessage}</Text>
-                        <TouchableOpacity
-                            style={[styles.saveButton, { backgroundColor: "#34A853" }]}
-                            onPress={() => setSuccessModalVisible(false)}
-                        >
-                            <Text style={styles.saveButtonText}>OK</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
-        </View >
+        </View>
     );
 }
 

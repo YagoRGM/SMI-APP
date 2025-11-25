@@ -5,55 +5,55 @@ import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 const API_URL = "https://smi-app-production.up.railway.app/sensores/atual"; 
 
 export default function SensorScreen() {
-  const [dados, setDados] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // const [dados, setDados] = useState(null);
+  // const [loading, setLoading] = useState(true);
 
-  async function carregarDados() {
-    try {
-      const r = await fetch(API_URL);
-      if (!r.ok) {
-        throw new Error(`Erro de rede: ${r.status}`);
-      }
-      const json = await r.json();
-      setDados(json);
-    } catch (e) {
-      console.error("Falha ao buscar dados da API:", e);
-    } finally {
-      setLoading(false); // Sempre para o loading, mesmo se der erro
-    }
-  }
+  // async function carregarDados() {
+  //   try {
+  //     const r = await fetch(API_URL);
+  //     if (!r.ok) {
+  //       throw new Error(`Erro de rede: ${r.status}`);
+  //     }
+  //     const json = await r.json();
+  //     setDados(json);
+  //   } catch (e) {
+  //     console.error("Falha ao buscar dados da API:", e);
+  //   } finally {
+  //     setLoading(false); // Sempre para o loading, mesmo se der erro
+  //   }
+  // }
 
-  // O useEffect executa a função carregarDados quando o componente é montado.
-  // O setInterval faz com que a função seja executada novamente a cada 2 segundos.
-  useEffect(() => {
-    carregarDados(); 
-    const timer = setInterval(() => carregarDados(), 2000); 
+  // // O useEffect executa a função carregarDados quando o componente é montado.
+  // // O setInterval faz com que a função seja executada novamente a cada 2 segundos.
+  // useEffect(() => {
+  //   carregarDados(); 
+  //   const timer = setInterval(() => carregarDados(), 2000); 
 
-    // O "return" limpa o intervalo quando a tela é fechada, evitando erros.
-    return () => clearInterval(timer);
-  }, []); // O array vazio [] garante que isso só rode na montagem inicial
+  //   // O "return" limpa o intervalo quando a tela é fechada, evitando erros.
+  //   return () => clearInterval(timer);
+  // }, []); // O array vazio [] garante que isso só rode na montagem inicial
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#007bff" />
-        <Text>Conectando à API...</Text>
-      </View>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <View style={styles.container}>
+  //       <ActivityIndicator size="large" color="#007bff" />
+  //       <Text>Conectando à API...</Text>
+  //     </View>
+  //   );
+  // }
 
-  // Se não há dados, mostra uma mensagem de erro
-  if (!dados || !dados.id_maquina) {
-    return (
-        <View style={styles.container}>
-            <Text style={styles.errorText}>Aguardando o primeiro dado da API...</Text>
-        </View>
-    );
-  }
+  // // Se não há dados, mostra uma mensagem de erro
+  // if (!dados || !dados.id_maquina) {
+  //   return (
+  //       <View style={styles.container}>
+  //           <Text style={styles.errorText}>Aguardando o primeiro dado da API...</Text>
+  //       </View>
+  //   );
+  // }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Máquina: {dados.nome_maquina} ({dados.id_maquina})</Text>
+      {/* <Text style={styles.title}>Máquina: {dados.nome_maquina} ({dados.id_maquina})</Text>
       
       <View style={styles.dataBlock}>
         <Text style={styles.label}>Temperatura:</Text>
@@ -70,7 +70,7 @@ export default function SensorScreen() {
         <Text style={styles.value}>{dados.vibracao === 1 ? 'ALERTA' : 'Normal'}</Text>
       </View>
       
-      <Text style={styles.timestamp}>Última Leitura: {new Date(dados.timestamp).toLocaleTimeString()}</Text>
+      <Text style={styles.timestamp}>Última Leitura: {new Date(dados.timestamp).toLocaleTimeString()}</Text> */}
     </View>
   );
 }
