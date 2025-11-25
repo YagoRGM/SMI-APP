@@ -53,15 +53,22 @@ A plataforma SMI foi desenvolvida para garantir estabilidade, segurança e escal
 
 ## 🚀 Instalação e Configuração (Desenvolvimento)
 
-Para clonar e rodar o projeto localmente para fins de desenvolvimento, siga os passos abaixo.
+Para clonar e rodar o projeto localmente para fins de desenvolvimento, que utiliza o framework **Expo** para a interface móvel, siga os passos abaixo.
 
 ### Pré-requisitos
 
-* [Adicione o pré-requisito principal, ex: Node.js (v18+)]
-* [Adicione o pré-requisito de banco de dados, ex: Docker ou PostgreSQL]
+Certifique-se de ter instalado em sua máquina:
+* **Node.js** (versão LTS recomendada)
+* **npm** (gerenciador de pacotes) ou **Yarn**
+* **Expo Go App** (instalado em seu celular/tablet) ou um simulador/emulador.
 
 ### 1. Clonar o Repositório
+
+Baixe o código-fonte do projeto:
 
 ```bash
 git clone [https://github.com/YagoRGM/SMI-APP.git](https://github.com/YagoRGM/SMI-APP.git)
 cd SMI-APP
+
+npm install
+npx expo start
