@@ -40,28 +40,58 @@ export default function Login() {
   };
 
   const handleLogin = async () => {
-    if (!cpf) return setErrorAndShowModal("Informe o CPF.");
-    if (cleanCpf(cpf).length !== 11) return setErrorAndShowModal("CPF deve ter 11 dígitos.");
-    if (!senha) return setErrorAndShowModal("Informe a senha.");
+  if (!cpf) return setErrorAndShowModal("Informe o CPF.");
+  if (cleanCpf(cpf).length !== 11) return setErrorAndShowModal("CPF deve ter 11 dígitos.");
+  if (!senha) return setErrorAndShowModal("Informe a senha.");
 
-    setLoading(true);
-    try {
-      const data = await login(cleanCpf(cpf), senha);
-      if (data.erro) {
-        // mensagens específicas do backend
-        setErrorAndShowModal(data.erro || "Credenciais inválidas");
-      } else {
-        // salvar somente os dados necessários (sem senha)
-        await AsyncStorage.setItem("@user_data", JSON.stringify(data));
-        setModalSuccessVisible(true);
-        setCpf("");
-        setSenha("");
-      }
-    } catch (e) {
-      setErrorAndShowModal(e.message || "Erro de conexão.");
+  setLoading(true);
+  try {
+    const data = await login(cleanCpf(cpf), senha);
+    console.log("DEBUG - resposta login:", data); // <--- deixa isso por enquanto
+
+    // se backend devolve { erro: "..." }
+    if (data && data.erro) {
+      setErrorAndShowModal(data.erro || "Credenciais inválidas");
+      setLoading(false);
+      return;
     }
+
+    // extrai o objeto de usuário vindo em data.usuario ou no próprio data
+    const usuario = (data && data.usuario) ? data.usuario : data;
+
+    // se por algum motivo não veio usuário
+    if (!usuario || !usuario.id_usuario) {
+      setErrorAndShowModal("Resposta inválida do servidor.");
+      setLoading(false);
+      return;
+    }
+
+    // pega status e normaliza
+    const statusRaw = (usuario.status_usuario || usuario.status || "").toString().trim().toLowerCase();
+
+    // considera variações: "inativo", "inativado", "inativado." etc.
+    const isInativo = statusRaw.includes("inativ");
+
+    if (isInativo) {
+      setErrorAndShowModal("Seu usuário está com status Inativado, no momento não é possível fazer login.");
+      setLoading(false);
+      return;
+    }
+
+    // tudo OK: salva apenas o que precisa (remova senha por segurança)
+    await AsyncStorage.setItem("@user_data", JSON.stringify(data));
+    setModalSuccessVisible(true);
+    setCpf("");
+    setSenha("");
     setLoading(false);
-  };
+  } catch (e) {
+    // console.log("DEBUG - erro login:", e); DEBUG
+    setErrorAndShowModal(e.message || "Erro de conexão.");
+    setLoading(false);
+  }
+};
+
+
 
   const handleSuccessConfirm = () => {
     setModalSuccessVisible(false);

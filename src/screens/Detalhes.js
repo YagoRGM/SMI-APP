@@ -31,6 +31,13 @@ export default function Detalhes({ route, navigation }) {
     const [historico, setHistorico] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const imagens = {
+        1: require("../assets/img/imagem_maquina1.png"),
+        2: require("../assets/img/imagem_maquina2.png"),
+        3: require("../assets/img/imagem_maquina3.png"),
+        4: require("../assets/img/imagem_maquina4.png"),
+    };
+
     useEffect(() => {
         load();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -226,7 +233,11 @@ export default function Detalhes({ route, navigation }) {
                         </View>
                     </View>
 
-                    <Image source={require("../assets/img/maquina2.png")} style={styles.machineImage} resizeMode="contain" />
+                    <Image
+                        source={imagens[maquina.imagem_maquina] || imagens[1]}
+                        style={{ width: 80, height: 80 }}
+                    />
+
                 </View>
 
                 {/* === MÉTRICAS === */}

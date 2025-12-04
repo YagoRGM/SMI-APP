@@ -36,6 +36,33 @@ export async function listarUsuarios() {
   return res.json();
 }
 
+export async function recuperarSenha(cpf, senha_nova, confirmar_senha) {
+  const res = await fetch(`${API_URL}/esqueci-senha`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ cpf, senha_nova, confirmar_senha }),
+  });
+  return res.json();
+}
+
+export async function excluirUsuario(id) {
+  // retorna o mesmo padrão usado em atualizarUsuario (status, ok, json)
+  const res = await fetch(`${API_URL}/usuarios/${id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  // tenta parsear JSON (algumas respostas podem não retornar body)
+  let json = {};
+  try {
+    json = await res.json();
+  } catch (e) {
+    json = {};
+  }
+
+  return { status: res.status, ok: res.ok, json };
+}
+
 // ---------------------
 // MÁQUINAS
 // ---------------------
@@ -102,3 +129,9 @@ export async function pegarHistoricoDaMaquina(id, limit = 5) {
   if (!json.ok) return [];
   return json.leituras;
 }
+
+export async function pegarMediaLeituras() {
+  const r = await fetch(`${API_URL}/leituras/media`);
+  return r.json();
+}
+

@@ -76,12 +76,14 @@ export default function GerenciarUsuarios() {
         };
 
         try {
-            // usa o mesmo padrão que Perfil: retorna JSON
-            const res = await atualizarUsuario(usuarioSelecionado?.id_usuario, updatedUser);
-            if (res.ok && res.json.ok) {
-                // sucesso
+            const res = await atualizarUsuario(usuarioSelecionado.id_usuario, updatedUser);
+
+            if (res.ok) {
+                setEditModalVisible(false);
+                carregarUsuarios();
+                Alert.alert("Sucesso", "Usuário atualizado!");
             } else {
-                Alert.alert("Erro", res.json.erro || "Não foi possível atualizar.");
+                Alert.alert("Erro", res.erro || "Não foi possível atualizar.");
             }
 
         } catch (e) {
@@ -96,20 +98,26 @@ export default function GerenciarUsuarios() {
     };
 
     const excluirUsuarioAction = async () => {
+        if (!usuarioSelecionado) return;
+
         try {
             const res = await excluirUsuario(usuarioSelecionado.id_usuario);
-            if (res.ok) {
+
+            if (res.ok && res.json.ok) {
                 setDeleteModalVisible(false);
-                carregarUsuarios();
+                setUsuarioSelecionado(null);
+                await carregarUsuarios();
                 Alert.alert("Sucesso", "Usuário excluído.");
             } else {
-                Alert.alert("Erro", res.erro || "Não foi possível excluir.");
+                const errMsg = (res.json && res.json.erro) || "Não foi possível excluir.";
+                Alert.alert("Erro", errMsg);
             }
         } catch (e) {
-            console.log(e);
+            console.log("Erro ao excluir usuário:", e);
             Alert.alert("Erro", "Falha ao excluir usuário.");
         }
     };
+
 
     return (
         <View style={styles.view}>
@@ -190,24 +198,30 @@ export default function GerenciarUsuarios() {
                             value={novoSetor}
                             onChangeText={setNovoSetor}
                         />
-                        <View style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
+                        <View style={styles.statusContainer}>
+
                             <TouchableOpacity
-                                style={[styles.statusBtn, novoStatus === "ATIVO" ? styles.statusActive : null]}
+                                style={[styles.statusOption, novoStatus === "ATIVO" && styles.statusSelectedActive]}
                                 onPress={() => setNovoStatus("ATIVO")}
                             >
-                                <Text style={novoStatus === "ATIVO" ? styles.statusTextActive : styles.statusText}>
+                                <Ionicons name="checkmark-circle" size={18} color={novoStatus === "ATIVO" ? "#fff" : "#34A853"} />
+                                <Text style={[styles.statusTextBase, novoStatus === "ATIVO" && styles.statusTextSelected]}>
                                     ATIVO
                                 </Text>
                             </TouchableOpacity>
+
                             <TouchableOpacity
-                                style={[styles.statusBtn, novoStatus === "INATIVO" ? styles.statusInactive : null]}
+                                style={[styles.statusOption, novoStatus === "INATIVO" && styles.statusSelectedInactive]}
                                 onPress={() => setNovoStatus("INATIVO")}
                             >
-                                <Text style={novoStatus === "INATIVO" ? styles.statusTextActive : styles.statusText}>
+                                <Ionicons name="close-circle" size={18} color={novoStatus === "INATIVO" ? "#fff" : "#E53935"} />
+                                <Text style={[styles.statusTextBase, novoStatus === "INATIVO" && styles.statusTextSelected]}>
                                     INATIVO
                                 </Text>
                             </TouchableOpacity>
+
                         </View>
+
 
                         <TouchableOpacity style={styles.saveButton} onPress={salvarEdicao}>
                             <Text style={styles.saveButtonText}>Salvar Alterações</Text>
@@ -365,4 +379,41 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     saveButtonText: { color: "#fff", fontWeight: "bold", fontSize: 15 },
+    statusContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: 10,
+        marginVertical: 10,
+    },
+
+    statusOption: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: 10,
+        paddingHorizontal: 18,
+        borderRadius: 25,
+        borderWidth: 2,
+        borderColor: "#ccc",
+        backgroundColor: "#fff",
+    },
+
+    statusSelectedActive: {
+        backgroundColor: "#34A853",
+        borderColor: "#34A853",
+    },
+
+    statusSelectedInactive: {
+        backgroundColor: "#E53935",
+        borderColor: "#E53935",
+    },
+
+    statusTextBase: {
+        fontSize: 14,
+        marginLeft: 8,
+        fontWeight: "600",
+    },
+
+    statusTextSelected: {
+        color: "#fff",
+    },
 });

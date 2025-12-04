@@ -7,7 +7,7 @@ const { width, height } = Dimensions.get("window");
 export default function Splash({ navigation }) {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace("MainTabs");
+      navigation.replace("Login");
     }, 5000); // ou use onAnimationFinish
     return () => clearTimeout(timer);
   }, [navigation]);

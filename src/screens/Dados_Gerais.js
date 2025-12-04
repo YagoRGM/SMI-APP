@@ -18,7 +18,6 @@ export default function DadosGerais() {
     };
 
     const consumoEnergetico = [420, 380, 400, 450, 430, 410]; // kWh
-    const co2Produzido = [120, 110, 115, 130, 125, 118]; // kg
     const labels = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
     const navigation = useNavigation();
@@ -110,26 +109,6 @@ export default function DadosGerais() {
                             </View>
                         </View>
                     </View>
-                </View>
-
-                {/* === CO2 PRODUZIDO === */}
-                <View style={styles.chartCard}>
-                    <Text style={styles.chartTitle}>CO2 Produzido (kg)</Text>
-                    <BarChart
-                        data={{
-                            labels,
-                            datasets: [{ data: co2Produzido }],
-                        }}
-                        width={screenWidth}
-                        height={220}
-                        chartConfig={{
-                            backgroundGradientFrom: "#112240",
-                            backgroundGradientTo: "#112240",
-                            color: () => "#ff5252",
-                            labelColor: () => "#ccc",
-                        }}
-                        style={{ borderRadius: 12, marginTop: 10, marginLeft: -16 }}
-                    />
                 </View>
             </ScrollView>
         </View>
